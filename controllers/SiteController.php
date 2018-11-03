@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -86,15 +87,27 @@ class SiteController extends Controller
         ]);
     }
 
+    public function actionSignup()
+    {
+        $model = new User();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        return $this->render('signup', [
+            'model' => $model,
+        ]);
+    }
+
     /**
      * Logout action.
-     *
      * @return Response
      */
     public function actionLogout()
     {
+        Yii::$app->user->identity->purgeAccessToken();
         Yii::$app->user->logout();
-
         return $this->goHome();
     }
 
@@ -124,5 +137,17 @@ class SiteController extends Controller
     public function actionAbout()
     {
         return $this->render('about');
+    }
+
+    /**
+     * @param $action
+     * @return bool
+     * @throws \yii\web\BadRequestHttpException
+     */
+    public function beforeAction($action)
+    {
+        if (Yii::$app->user->isGuest && $token = Yii::$app->getRequest()->getCookies()->get('access_token'))
+            Yii::$app->user->loginByAccessToken($token->value);
+        return parent::beforeAction($action);
     }
 }
