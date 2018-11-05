@@ -11,13 +11,19 @@ use yii\web\IdentityInterface;
  * This is the model class for table "user".
  *
  * @property int $id
+ * @property string $email
  * @property string $username
  * @property string $password
  * @property string $auth_key
  * @property string $access_token
+ * @property string $verification_token
  */
 class User extends ActiveRecord implements IdentityInterface
 {
+
+    const STATUS_INACTIVE = 0;
+    const STATUS_ACTIVE = 1;
+
     /**
      * {@inheritdoc}
      */
@@ -32,7 +38,9 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'password'], 'string', 'max' => 32],
+            [['email'], 'email'],
+            [['email', 'username', 'password'], 'required'],
+            [['status'], 'in', 'range' => [self::STATUS_INACTIVE, self::STATUS_ACTIVE]],
         ];
     }
 
@@ -43,10 +51,12 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             'id' => 'ID',
+            'email' => 'E-mail',
             'username' => 'Username',
             'password' => 'Password',
             'auth_key' => 'Auth Key',
             'access_token' => 'Access Token',
+            'verification_token' => 'Confirm Token',
         ];
     }
 
@@ -71,18 +81,23 @@ class User extends ActiveRecord implements IdentityInterface
     public static function findIdentityByAccessToken($token, $type = NULL)
     {
         /*if ($user = static::findOne(['access_token' => $token])) {
-            return $user->accessTokenIsValid($token) ? $user : null;
+            return $user->validateAccessToken($token) ? $user : null;
         }
         return null;*/
 
         return static::findOne(['access_token' => $token]);
     }
 
+    public static function findIdentityByVerificationToken($token)
+    {
+        return static::findOne(['verification_token' => $token]);
+    }
+
     /**
      * Checks if the given token is valid.
      * @return bool
      */
-    public function accessTokenIsValid($token)
+    public function validateAccessToken($token)
     {
         if ($this->access_token == $token) {
             return true;
@@ -97,7 +112,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function generateAccessToken($expireInSeconds)
     {
-        $this->access_token = Yii::$app->security->generateRandomString(16);
+        $this->access_token = Yii::$app->security->generateRandomString();
         Yii::$app->getResponse()->getCookies()->add(new Cookie([
             'name' => 'access_token',
             'value' => $this->access_token,
@@ -155,6 +170,19 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->password === $password;
     }
 
+    public function sendEmailVerification()
+    {
+        if ($emailSent = Yii::$app->mailer
+            ->compose(['html' => 'user-verify-html'], ['user' => $this])
+            ->setTo($this->email)
+            ->setFrom(Yii::$app->params['adminEmail'])
+            ->setSubject('Account verification.')
+            ->send())
+            Yii::$app->session->setFlash('success', 'Check your email to confirm the registration.');
+        else throw new \RuntimeException('Sending error.');
+
+    }
+
     /**
      * Executes before saving a record.
      * @param bool $insert
@@ -166,6 +194,7 @@ class User extends ActiveRecord implements IdentityInterface
         if (parent::beforeSave($insert)) {
             if ($this->isNewRecord) {
                 $this->auth_key = \Yii::$app->security->generateRandomString();
+                $this->verification_token = Yii::$app->security->generateRandomString();
             }
             return true;
         }

@@ -13,11 +13,14 @@ class m181102_101433_create_user_table extends Migration
     public function safeUp()
     {
         $this->createTable('user', [
-            'id' => $this->primaryKey(),
+            'id' => $this->primaryKey(11)->unsigned(),
+            'email'=>$this->string(64),
             'username' => $this->string(32),
             'password' => $this->string(32),
-            'auth_key' => $this->string(16),
-            'access_key' => $this->string(16),
+            'auth_key' => $this->string(32),
+            'access_token' => $this->string(32),
+            'verification_token' => $this->string(32),
+            'status' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0),
         ]);
     }
 

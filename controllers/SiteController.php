@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\SignupForm;
 use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
@@ -69,6 +70,7 @@ class SiteController extends Controller
      * Login action.
      *
      * @return Response|string
+     * @throws \yii\base\Exception
      */
     public function actionLogin()
     {
@@ -90,9 +92,9 @@ class SiteController extends Controller
     public function actionSignup()
     {
         $model = new User();
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            $model->sendEmailVerification();
+            return $this->goHome();
         }
 
         return $this->render('signup', [
@@ -137,6 +139,18 @@ class SiteController extends Controller
     public function actionAbout()
     {
         return $this->render('about');
+    }
+
+    public function actionVerifyUser($token)
+    {
+        if ($user = User::findIdentityByVerificationToken($token)) {
+            $user->verification_token = null;
+            $user->status = User::STATUS_ACTIVE;
+            $user->save();
+            Yii::$app->user->login($user);
+            Yii::$app->session->setFlash('success', 'Account verified!');
+            return $this->render('index');
+        }
     }
 
     /**
