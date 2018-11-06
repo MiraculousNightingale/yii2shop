@@ -14,9 +14,10 @@ class m181102_101433_create_user_table extends Migration
     {
         $this->createTable('user', [
             'id' => $this->primaryKey(11)->unsigned(),
-            'email'=>$this->string(64),
+            'email' => $this->string(64),
             'username' => $this->string(32),
-            'password' => $this->string(32),
+            'hash' => $this->string(60),
+            'salt' => $this->string(32),
             'auth_key' => $this->string(32),
             'access_token' => $this->string(32),
             'verification_token' => $this->string(32),

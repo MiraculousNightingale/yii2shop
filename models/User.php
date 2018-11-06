@@ -13,7 +13,8 @@ use yii\web\IdentityInterface;
  * @property int $id
  * @property string $email
  * @property string $username
- * @property string $password
+ * @property string $hash
+ * @property string $salt
  * @property string $auth_key
  * @property string $access_token
  * @property string $verification_token
@@ -39,7 +40,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             [['email'], 'email'],
-            [['email', 'username', 'password'], 'required'],
+            [['email', 'username'], 'required'],
             [['status'], 'in', 'range' => [self::STATUS_INACTIVE, self::STATUS_ACTIVE]],
         ];
     }
@@ -53,11 +54,29 @@ class User extends ActiveRecord implements IdentityInterface
             'id' => 'ID',
             'email' => 'E-mail',
             'username' => 'Username',
-            'password' => 'Password',
+            'hash' => 'Hash',
+            'salt' => 'Salt',
             'auth_key' => 'Auth Key',
             'access_token' => 'Access Token',
             'verification_token' => 'Confirm Token',
         ];
+    }
+
+    /**
+     * @param $form SignupForm
+     * @return bool true if data received successfully | false if unsuccessful
+     */
+    public function getDataFromForm($form)
+    {
+        try {
+            $this->email = $form->email;
+            $this->username = $form->username;
+            $this->salt = Yii::$app->security->generateRandomString();
+            $this->hash = Yii::$app->security->generatePasswordHash($form->password . $this->salt);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
@@ -167,7 +186,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function validatePassword($password)
     {
-        return $this->password === $password;
+        return Yii::$app->security->validatePassword($password . $this->salt, $this->hash);
     }
 
     public function sendEmailVerification()

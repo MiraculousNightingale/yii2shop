@@ -89,16 +89,21 @@ class SiteController extends Controller
         ]);
     }
 
+    /**
+     * @return string|Response
+     * @throws \yii\base\Exception
+     */
     public function actionSignup()
     {
+        $form = new SignupForm();
         $model = new User();
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($form->load(Yii::$app->request->post()) && $model->getDataFromForm($form) && $model->save()) {
             $model->sendEmailVerification();
             return $this->goHome();
         }
 
         return $this->render('signup', [
-            'model' => $model,
+            'model' => $form,
         ]);
     }
 
