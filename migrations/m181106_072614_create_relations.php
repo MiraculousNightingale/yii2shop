@@ -18,6 +18,9 @@ use yii\db\Migration;
  *
  * Table `product` has foreign key to the table:
  * - `category`
+ *
+ * Table `product` has foreign key to the table:
+ * - `brand`
  */
 class m181106_072614_create_relations extends Migration
 {
@@ -133,6 +136,24 @@ class m181106_072614_create_relations extends Migration
             'CASCADE',
             'CASCADE'
         );
+
+        // creates index for column `brand_id` in table `product`
+        $this->createIndex(
+            'idx-product-brand_id',
+            'product',
+            'brand_id'
+        );
+
+        //add foreign key for table `brand`
+        $this->addForeignKey(
+            'fk-product-brand_id',
+            'product',
+            'brand_id',
+            'brand',
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
     }
 
     /**
@@ -210,6 +231,18 @@ class m181106_072614_create_relations extends Migration
         $this->dropIndex(
             'idx-category_trait-category_id',
             'category_trait'
+        );
+
+        // drops foreign key for table `brand`
+        $this->dropForeignKey(
+            'fk-product-brand_id',
+            'product'
+        );
+
+        // drops index for column `brand_id`
+        $this->dropIndex(
+            'idx-product-brand_id',
+            'product'
         );
     }
 }

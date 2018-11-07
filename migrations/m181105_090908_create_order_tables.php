@@ -16,6 +16,9 @@ class m181105_090908_create_order_tables extends Migration
             'id' => $this->primaryKey(11)->unsigned(),
             'price' => $this->float(2)->unsigned(),
             'description' => $this->string(255),
+            'status' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0),
+            'delivery_type' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0),
+            'destination' => $this->string(64),
             'user_id' => $this->integer(11)->unsigned(),
             'created_at' => $this->string(16)
         ]);
@@ -24,7 +27,7 @@ class m181105_090908_create_order_tables extends Migration
             'id' => $this->primaryKey(11)->unsigned(),
             'order_id' => $this->integer(11)->unsigned(),
             'product_id' => $this->integer(11)->unsigned(),
-            'amount' => $this->integer(11)->unsigned(),
+            'amount' => $this->integer(11)->unsigned()
         ]);
     }
 

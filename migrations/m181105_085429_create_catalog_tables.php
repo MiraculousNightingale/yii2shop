@@ -3,7 +3,7 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of catalog tables: `product`, `category`, `trait`, `category_trait`.
+ * Handles the creation of catalog tables: `product`, `brand`, `category`, `trait`, `category_trait`.
  */
 class m181105_085429_create_catalog_tables extends Migration
 {
@@ -19,8 +19,15 @@ class m181105_085429_create_catalog_tables extends Migration
             'price' => $this->float(2)->unsigned(),
             'amount' => $this->integer(11)->unsigned(),
             'category_id' => $this->integer(11)->unsigned(),
+            'brand_id' => $this->integer(11)->unsigned(),
             'create_at' => $this->string(16),
             'update_at' => $this->string(16),
+        ]);
+
+        $this->createTable('brand', [
+            'id' => $this->primaryKey(11)->unsigned(),
+            'name' => $this->string(32),
+            'contact' => $this->string(64)
         ]);
 
         $this->createTable('category', [
@@ -47,6 +54,7 @@ class m181105_085429_create_catalog_tables extends Migration
     public function safeDown()
     {
         $this->dropTable('product');
+        $this->dropTable('brand');
         $this->dropTable('category');
         $this->dropTable('trait');
         $this->dropTable('category_trait');
