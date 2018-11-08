@@ -29,10 +29,27 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
+            'email:email',
             'username',
-            'password',
+            'hash',
+            'salt',
             'auth_key',
             'access_token',
+            'verification_token',
+            [
+                'attribute' => 'role',
+                'value' => function ($model) {
+                    /** @var \app\models\User $model */
+                    return $model->getRole();
+                }
+            ],
+            [
+                'attribute' => 'status',
+                'value' => function ($model) {
+                    /** @var \app\models\User $model */
+                    return $model->getStatus();
+                }
+            ],
         ],
     ]) ?>
 

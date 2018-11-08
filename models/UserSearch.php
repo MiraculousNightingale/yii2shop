@@ -9,6 +9,7 @@ use app\models\User;
 
 /**
  * UserSearch represents the model behind the search form of `app\models\User`.
+ * @property mixed status
  */
 class UserSearch extends User
 {
@@ -18,8 +19,8 @@ class UserSearch extends User
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['username', 'password', 'auth_key', 'access_token'], 'safe'],
+            [['id', 'status', 'role'], 'integer'],
+            [['email', 'username', 'hash', 'salt', 'auth_key', 'access_token', 'verification_token'], 'safe'],
         ];
     }
 
@@ -60,12 +61,12 @@ class UserSearch extends User
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'status' => $this->status,
+            'role' => $this->role,
         ]);
 
-        $query->andFilterWhere(['like', 'username', $this->username])
-            ->andFilterWhere(['like', 'password', $this->password])
-            ->andFilterWhere(['like', 'auth_key', $this->auth_key])
-            ->andFilterWhere(['like', 'access_token', $this->access_token]);
+        $query->andFilterWhere(['like', 'email', $this->email])
+            ->andFilterWhere(['like', 'username', $this->username]);
 
         return $dataProvider;
     }

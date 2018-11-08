@@ -95,15 +95,13 @@ class SiteController extends Controller
      */
     public function actionSignup()
     {
-        $form = new SignupForm();
-        $model = new User();
-        if ($form->load(Yii::$app->request->post()) && $model->getDataFromForm($form) && $model->save()) {
-            $model->sendEmailVerification();
+        $model = new SignupForm();
+        if ($model->load(Yii::$app->request->post()) && $model->signup()) {
             return $this->goHome();
         }
 
         return $this->render('signup', [
-            'model' => $form,
+            'model' => $model,
         ]);
     }
 
@@ -148,14 +146,14 @@ class SiteController extends Controller
 
     public function actionVerifyUser($token)
     {
-        if ($user = User::findIdentityByVerificationToken($token)) {
-            $user->verification_token = null;
-            $user->status = User::STATUS_ACTIVE;
-            $user->save();
-            Yii::$app->user->login($user);
-            Yii::$app->session->setFlash('success', 'Account verified!');
-            return $this->render('index');
-        }
+        if ($user = User::findIdentityByVerificationToken($token))
+            if ($user->verify()) {
+                Yii::$app->session->setFlash('success', 'Account verified!');
+                Yii::$app->user->login($user);
+                return $this->render('index');
+            }
+        Yii::$app->session->setFlash('danger', 'Invalid token.');
+        return $this->render('index');
     }
 
     /**
@@ -165,8 +163,9 @@ class SiteController extends Controller
      */
     public function beforeAction($action)
     {
-        if (Yii::$app->user->isGuest && $token = Yii::$app->getRequest()->getCookies()->get('access_token'))
-            Yii::$app->user->loginByAccessToken($token->value);
+//        TODO: Decide what to do with 'access_token'
+//        if (Yii::$app->user->isGuest && $token = Yii::$app->getRequest()->getCookies()->get('access_token'))
+//            Yii::$app->user->loginByAccessToken($token->value);
         return parent::beforeAction($action);
     }
 }

@@ -105,6 +105,7 @@ class UserController extends Controller
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
+
         return $this->redirect(['index']);
     }
 
@@ -122,11 +123,5 @@ class UserController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-    public function beforeAction($action)
-    {
-
-        return $this->beforeAction($action);
     }
 }

@@ -13,17 +13,25 @@ use yii\web\IdentityInterface;
  * @property int $id
  * @property string $email
  * @property string $username
+ * @property int $role
  * @property string $hash
  * @property string $salt
  * @property string $auth_key
  * @property string $access_token
  * @property string $verification_token
+ * @property string $status
  */
 class User extends ActiveRecord implements IdentityInterface
 {
 
     const STATUS_INACTIVE = 0;
     const STATUS_ACTIVE = 1;
+
+    const ROLE_USER = 0;
+    const ROLE_ADMIN = 1;
+    const ROLE_OVERLORD = 2;
+
+    public $password;
 
     /**
      * {@inheritdoc}
@@ -41,7 +49,9 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             [['email'], 'email'],
             [['email', 'username'], 'required'],
-            [['status'], 'in', 'range' => [self::STATUS_INACTIVE, self::STATUS_ACTIVE]],
+            [['role'], 'in', 'range' => array_keys(self::getRoles())],
+            [['status'], 'in', 'range' => array_keys(self::getStatuses())],
+            [['password'], 'string'],
         ];
     }
 
@@ -54,29 +64,32 @@ class User extends ActiveRecord implements IdentityInterface
             'id' => 'ID',
             'email' => 'E-mail',
             'username' => 'Username',
+            'role' => 'Role',
             'hash' => 'Hash',
             'salt' => 'Salt',
             'auth_key' => 'Auth Key',
             'access_token' => 'Access Token',
             'verification_token' => 'Confirm Token',
+            'status' => 'Status',
+            'password' => 'Change password',
         ];
     }
 
-    /**
-     * @param $form SignupForm
-     * @return bool true if data received successfully | false if unsuccessful
-     */
-    public function getDataFromForm($form)
+    public static function getRoles()
     {
-        try {
-            $this->email = $form->email;
-            $this->username = $form->username;
-            $this->salt = Yii::$app->security->generateRandomString();
-            $this->hash = Yii::$app->security->generatePasswordHash($form->password . $this->salt);
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+        return [
+            self::ROLE_USER => 'User',
+            self::ROLE_ADMIN => 'Admin',
+            self::ROLE_OVERLORD => 'Super admin',
+        ];
+    }
+
+    public static function getStatuses()
+    {
+        return [
+            self::STATUS_INACTIVE => 'Inactive',
+            self::STATUS_ACTIVE => 'Active',
+        ];
     }
 
     /**
@@ -99,14 +112,14 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = NULL)
     {
-        /*if ($user = static::findOne(['access_token' => $token])) {
-            return $user->validateAccessToken($token) ? $user : null;
-        }
-        return null;*/
-
         return static::findOne(['access_token' => $token]);
     }
 
+    /**
+     * Finds an identity by the given verification token.
+     * @param string $token the token to be looked for
+     * @return IdentityInterface|null the identity object that matches the given token.
+     */
     public static function findIdentityByVerificationToken($token)
     {
         return static::findOne(['verification_token' => $token]);
@@ -114,6 +127,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * Checks if the given token is valid.
+     * @param string $token
      * @return bool
      */
     public function validateAccessToken($token)
@@ -170,6 +184,22 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * @return string current user role
+     */
+    public function getRole()
+    {
+        return self::getRoles()[$this->role];
+    }
+
+    /**
+     * @return string current user status
+     */
+    public function getStatus()
+    {
+        return self::getStatuses()[$this->status];
+    }
+
+    /**
      * @param string $authKey
      * @return bool if auth key is valid for current user
      */
@@ -189,17 +219,39 @@ class User extends ActiveRecord implements IdentityInterface
         return Yii::$app->security->validatePassword($password . $this->salt, $this->hash);
     }
 
+    public function validateStatus()
+    {
+        return $this->status > User::STATUS_INACTIVE;
+    }
+
+    public function validateVerificationToken($token)
+    {
+        return $this->verification_token == $token;
+    }
+
+    /**
+     * Sends mail with verification message
+     * @return bool if mail was sent successfully
+     */
     public function sendEmailVerification()
     {
-        if ($emailSent = Yii::$app->mailer
+        return Yii::$app->mailer
             ->compose(['html' => 'user-verify-html'], ['user' => $this])
             ->setTo($this->email)
             ->setFrom(Yii::$app->params['adminEmail'])
             ->setSubject('Account verification.')
-            ->send())
-            Yii::$app->session->setFlash('success', 'Check your email to confirm the registration.');
-        else throw new \RuntimeException('Sending error.');
+            ->send();
+    }
 
+    /**
+     * @param $token
+     * @return bool true if user verified successfully | false if unsuccessfully
+     */
+    public function verify()
+    {
+        $this->verification_token = null;
+        $this->status = User::STATUS_ACTIVE;
+        return $this->save();
     }
 
     /**
@@ -211,8 +263,14 @@ class User extends ActiveRecord implements IdentityInterface
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
+            // Used when creating or editing a user record
+            if (!empty($this->password)) {
+                $this->salt = Yii::$app->security->generateRandomString();
+                $this->hash = Yii::$app->security->generatePasswordHash($this->password . $this->salt);
+                $this->password = null;
+            }
             if ($this->isNewRecord) {
-                $this->auth_key = \Yii::$app->security->generateRandomString();
+                $this->auth_key = Yii::$app->security->generateRandomString();
                 $this->verification_token = Yii::$app->security->generateRandomString();
             }
             return true;

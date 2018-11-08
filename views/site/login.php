@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php ActiveForm::end(); ?>
 
-    <div>
+    <div class="alert alert-info">
         <h4>Don't have an account? Feel free to sign up!</h4>
         <?= Html::a('Sign up', ['site/signup'], ['class' => 'btn btn-info']) ?>
     </div>
