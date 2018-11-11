@@ -5,9 +5,9 @@ use yii\db\Migration;
 /**
  * Handles the creation of relations
  *
- * Table `category_trait` has foreign keys to the tables:
+ * Table `category_feature` has foreign keys to the tables:
  * - `category`
- * - `trait`
+ * - `feature`
  *
  * Table `order_item` has foreign keys to the tables:
  * - `order`
@@ -101,17 +101,17 @@ class m181106_072614_create_relations extends Migration
             'CASCADE'
         );
 
-        // creates index for column `category_id` in table `category_trait`
+        // creates index for column `category_id` in table `category_feature`
         $this->createIndex(
-            'idx-category_trait-category_id',
-            'category_trait',
+            'idx-category_feature-category_id',
+            'category_feature',
             'category_id'
         );
 
         //add foreign key for table `category`
         $this->addForeignKey(
-            'fk-category_trait-category_id',
-            'category_trait',
+            'fk-category_feature-category_id',
+            'category_feature',
             'category_id',
             'category',
             'id',
@@ -119,19 +119,19 @@ class m181106_072614_create_relations extends Migration
             'CASCADE'
         );
 
-        // creates index for column `trait_id` in table `category_trait`
+        // creates index for column `feature_id` in table `category_feature`
         $this->createIndex(
-            'idx-category_trait-trait_id',
-            'category_trait',
-            'trait_id'
+            'idx-category_feature-feature_id',
+            'category_feature',
+            'feature_id'
         );
 
-        //add foreign key for table `trait`
+        //add foreign key for table `feature`
         $this->addForeignKey(
-            'fk-category_trait-trait_id',
-            'category_trait',
-            'trait_id',
-            'trait',
+            'fk-category_feature-feature_id',
+            'category_feature',
+            'feature_id',
+            'feature',
             'id',
             'CASCADE',
             'CASCADE'
@@ -209,28 +209,28 @@ class m181106_072614_create_relations extends Migration
             'product'
         );
 
-        // drops foreign key for table `trait`
+        // drops foreign key for table `feature`
         $this->dropForeignKey(
-            'fk-category_trait-trait_id',
-            'category_trait'
+            'fk-category_feature-feature_id',
+            'category_feature'
         );
 
-        // drops index for column `trait_id`
+        // drops index for column `feature_id`
         $this->dropIndex(
-            'idx-category_trait-trait_id',
-            'category_trait'
+            'idx-category_feature-feature_id',
+            'category_feature'
         );
 
         // drops foreign key for table `category`
         $this->dropForeignKey(
-            'fk-category_trait-category_id',
-            'category_trait'
+            'fk-category_feature-category_id',
+            'category_feature'
         );
 
         // drops index for column `category_id`
         $this->dropIndex(
-            'idx-category_trait-category_id',
-            'category_trait'
+            'idx-category_feature-category_id',
+            'category_feature'
         );
 
         // drops foreign key for table `brand`

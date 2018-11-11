@@ -3,7 +3,7 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of catalog tables: `product`, `brand`, `category`, `trait`, `category_trait`.
+ * Handles the creation of catalog tables: `product`, `brand`, `category`, `feature`, `category_feature`.
  */
 class m181105_085429_create_catalog_tables extends Migration
 {
@@ -15,13 +15,13 @@ class m181105_085429_create_catalog_tables extends Migration
         $this->createTable('product', [
             'id' => $this->primaryKey(11)->unsigned(),
             'title' => $this->string(32),
-            'description' => $this->string(255),
+            'description' => $this->text(),
             'price' => $this->float(2)->unsigned(),
             'amount' => $this->integer(11)->unsigned(),
             'category_id' => $this->integer(11)->unsigned(),
             'brand_id' => $this->integer(11)->unsigned(),
-            'create_at' => $this->string(16),
-            'update_at' => $this->string(16),
+            'created_at' => $this->string(16),
+            'updated_at' => $this->string(16),
         ]);
 
         $this->createTable('brand', [
@@ -35,16 +35,16 @@ class m181105_085429_create_catalog_tables extends Migration
             'name' => $this->string(32),
         ]);
 
-        $this->createTable('trait', [
+        $this->createTable('feature', [
             'id' => $this->primaryKey(11)->unsigned(),
             'name' => $this->string(32),
             'value' => $this->string(16)
         ]);
 
-        $this->createTable('category_trait', [
+        $this->createTable('category_feature', [
             'id' => $this->primaryKey(11)->unsigned(),
             'category_id' => $this->integer(11)->unsigned(),
-            'trait_id' => $this->integer(11)->unsigned()
+            'feature_id' => $this->integer(11)->unsigned()
         ]);
     }
 
@@ -56,7 +56,7 @@ class m181105_085429_create_catalog_tables extends Migration
         $this->dropTable('product');
         $this->dropTable('brand');
         $this->dropTable('category');
-        $this->dropTable('trait');
-        $this->dropTable('category_trait');
+        $this->dropTable('feature');
+        $this->dropTable('category_feature');
     }
 }

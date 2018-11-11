@@ -21,6 +21,7 @@ class m181102_101433_create_user_table extends Migration
             'auth_key' => $this->string(32),
             'access_token' => $this->string(32),
             'verification_token' => $this->string(32),
+            'role' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0),
             'status' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0),
         ]);
     }

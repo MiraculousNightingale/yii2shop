@@ -137,15 +137,21 @@ class SiteController extends Controller
     /**
      * Displays about page.
      *
-     * @return string
+     * @return Response|string
      */
     public function actionAbout()
     {
         return $this->render('about');
     }
 
+    /**
+     * Verifies user by a token. An absolute url to this action is sent to user mail.
+     * @param $token
+     * @return Response|string
+     */
     public function actionVerifyUser($token)
     {
+        /** @var User $user */
         if ($user = User::findIdentityByVerificationToken($token))
             if ($user->verify()) {
                 Yii::$app->session->setFlash('success', 'Account verified!');

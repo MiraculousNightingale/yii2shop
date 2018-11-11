@@ -186,7 +186,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @return string current user role
      */
-    public function getRole()
+    public function getRoleName()
     {
         return self::getRoles()[$this->role];
     }
@@ -194,7 +194,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @return string current user status
      */
-    public function getStatus()
+    public function getStatusName()
     {
         return self::getStatuses()[$this->status];
     }

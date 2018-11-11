@@ -1,23 +1,22 @@
 <?php
 
-use app\models\User;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\UserSearch */
+/* @var $searchModel app\models\BrandSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Users';
+$this->title = 'Brands';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="user-index">
+<div class="brand-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create User', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Brand', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([
@@ -26,18 +25,9 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'email:email',
-            'username',
-            [
-                'attribute' => 'role',
-                'value' => 'roleName',
-                'filter' => User::getRoles(),
-            ],
-            [
-                'attribute' => 'status',
-                'value' => 'statusName',
-                'filter' => User::getStatuses(),
-            ],
+            'id',
+            'name',
+            'contact',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],
