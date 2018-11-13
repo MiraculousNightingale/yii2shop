@@ -1,27 +1,27 @@
 <?php
 
-namespace app\models;
+namespace app\models\feature;
 
-use Yii;
+use app\models\category\CategoryFeature;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "category".
+ * This is the model class for table "feature".
  *
  * @property int $id
  * @property string $name
  *
  * @property CategoryFeature[] $categoryFeatures
- * @property Product[] $products
+ * @property ProductFeature[] $productFeatures
  */
-class Category extends ActiveRecord
+class Feature extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'category';
+        return 'feature';
     }
 
     /**
@@ -50,14 +50,12 @@ class Category extends ActiveRecord
      */
     public function getCategoryFeatures()
     {
-        return $this->hasMany(CategoryFeature::className(), ['category_id' => 'id']);
+        return $this->hasMany(CategoryFeature::className(), ['feature_id' => 'id']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProducts()
+    public function getProductFeatures()
     {
-        return $this->hasMany(Product::className(), ['category_id' => 'id']);
+        return $this->hasMany(ProductFeature::className(), ['feature_id' => 'id']);
     }
+
 }

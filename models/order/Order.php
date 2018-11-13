@@ -81,10 +81,6 @@ class Order extends ActiveRecord
 
     public function getItems()
     {
-        $items = [];
-        foreach ($this->orderItems as $item) {
-            $items[] = $item->product;
-        }
-        return $items;
+        return $this->hasMany(Product::className(), ['id' => 'product_id'])->via('orderItems');
     }
 }

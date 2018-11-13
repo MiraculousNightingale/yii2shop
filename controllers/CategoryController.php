@@ -2,22 +2,17 @@
 
 namespace app\controllers;
 
-use app\models\category\Category;
-use app\models\product\ProductSearch;
-use app\models\product\ProductFeatureForm;
-use app\models\product\ProductForm;
 use Yii;
-use app\models\product\Product;
-use yii\base\DynamicModel;
+use app\models\category\Category;
+use app\models\category\CategorySearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\UploadedFile;
 
 /**
- * ProductController implements the CRUD actions for Product model.
+ * CategoryController implements the CRUD actions for Category model.
  */
-class ProductController extends Controller
+class CategoryController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -35,12 +30,12 @@ class ProductController extends Controller
     }
 
     /**
-     * Lists all Product models.
+     * Lists all Category models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new ProductSearch();
+        $searchModel = new CategorySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -50,7 +45,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Displays a single Product model.
+     * Displays a single Category model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -63,41 +58,26 @@ class ProductController extends Controller
     }
 
     /**
-     * Creates a create Product model.
+     * Creates a create Category model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $product = new Product();
+        $model = new Category();
 
-        $productForm = new ProductForm();
-        $featureForm = new ProductFeatureForm();
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
-        if ($productForm->load(Yii::$app->request->post())) {
-            //Check if the submit was partial, only to load a different category.
-            if ($productForm->loadsCategory()) {
-                $featureForm = new ProductFeatureForm($productForm->category_id);
-                return $this->render('create', [
-                    'product' => $productForm,
-                    'features' => $featureForm,
-                ]);
-            }
-
-            if ($featureForm->load(Yii::$app->request->post()) && $product->saveWithForms($productForm, $featureForm)) {
-                return $this->redirect(['view', 'id' => $product->id]);
-            }
-
+            return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('create', [
-            'product' => $productForm,
-            'features' => $featureForm,
+            'model' => $model,
         ]);
     }
 
     /**
-     * Updates an existing Product model.
+     * Updates an existing Category model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -116,16 +96,12 @@ class ProductController extends Controller
         ]);
     }
 
-
     /**
-     * Deletes an existing Product model.
+     * Deletes an existing Category model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
-     * @throws \Exception
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
@@ -135,15 +111,15 @@ class ProductController extends Controller
     }
 
     /**
-     * Finds the Product model based on its primary key value.
+     * Finds the Category model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Product the loaded model
+     * @return Category the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Product::findOne($id)) !== null) {
+        if (($model = Category::findOne($id)) !== null) {
             return $model;
         }
 

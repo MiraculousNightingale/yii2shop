@@ -41,8 +41,16 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
-            !Yii::$app->user->isGuest && Yii::$app->user->identity->role == User::ROLE_OVERLORD ? ['label' => 'Manage Users', 'url' => ['/user/index']] : '',
             ['label' => 'About', 'url' => ['/site/about']],
+            [
+                'label' => 'Administrate',
+                'items' => [
+                    ['label' => 'Manage Users', 'url' => ['/user/index'], 'options' => ['class' => 'btn-info']],
+                    ['label' => 'Manage Products', 'url' => ['/product/index']],
+                    ['label' => 'Manage Brands', 'url' => ['/brand/index']],
+                    ['label' => 'Manage Categories', 'url' => ['/category/index']],
+                ],
+            ],
             Yii::$app->user->isGuest ? (
             ['label' => 'Login', 'url' => ['/site/login']]
             ) : (

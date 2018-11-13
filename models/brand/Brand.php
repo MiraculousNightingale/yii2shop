@@ -1,27 +1,28 @@
 <?php
 
-namespace app\models;
+namespace app\models\brand;
 
+use app\models\product\Product;
 use Yii;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "feature".
+ * This is the model class for table "brand".
  *
  * @property int $id
  * @property string $name
- * @property string $value
+ * @property string $contact
  *
- * @property CategoryFeature[] $categoryFeatures
+ * @property Product[] $products
  */
-class Feature extends ActiveRecord
+class Brand extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'feature';
+        return 'brand';
     }
 
     /**
@@ -31,7 +32,7 @@ class Feature extends ActiveRecord
     {
         return [
             [['name'], 'string', 'max' => 32],
-            [['value'], 'string', 'max' => 16],
+            [['contact'], 'string', 'max' => 64],
         ];
     }
 
@@ -43,15 +44,16 @@ class Feature extends ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
-            'value' => 'Value',
+            'contact' => 'Contact',
         ];
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCategoryFeatures()
+    public function getProducts()
     {
-        return $this->hasMany(CategoryFeature::className(), ['feature_id' => 'id']);
+        return $this->hasMany(Product::className(), ['brand_id' => 'id']);
     }
+
 }

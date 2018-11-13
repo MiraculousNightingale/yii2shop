@@ -2,9 +2,10 @@
 
 namespace app\controllers;
 
+
+use app\models\brand\Brand;
+use app\models\brand\BrandSearch;
 use Yii;
-use app\models\Brand;
-use app\models\BrandSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -58,7 +59,7 @@ class BrandController extends Controller
     }
 
     /**
-     * Creates a new Brand model.
+     * Creates a create Brand model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */

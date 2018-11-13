@@ -154,6 +154,41 @@ class m181106_072614_create_relations extends Migration
             'CASCADE',
             'CASCADE'
         );
+        // creates index for column `product_id` in table `product_feature`
+        $this->createIndex(
+            'idx-product_feature-product_id',
+            'product_feature',
+            'product_id'
+        );
+
+        //add foreign key for table `product_feature`
+        $this->addForeignKey(
+            'fk-product_feature-product_id',
+            'product_feature',
+            'product_id',
+            'product',
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
+
+        // creates index for column `feature_id` in table `product_feature`
+        $this->createIndex(
+            'idx-product_feature-feature_id',
+            'product_feature',
+            'feature_id'
+        );
+
+        //add foreign key for table `feature`
+        $this->addForeignKey(
+            'fk-product_feature-feature_id',
+            'product_feature',
+            'feature_id',
+            'feature',
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
     }
 
     /**

@@ -2,9 +2,9 @@
 
 namespace app\controllers;
 
+use app\models\user\User;
+use app\models\user\UserSearch;
 use Yii;
-use app\models\User;
-use app\models\UserSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -58,7 +58,7 @@ class UserController extends Controller
     }
 
     /**
-     * Creates a new User model.
+     * Creates a create User model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */

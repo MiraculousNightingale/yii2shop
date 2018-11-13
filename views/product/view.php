@@ -1,10 +1,11 @@
 <?php
 
+use app\models\product\Product;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Product */
+/* @var $model Product */
 
 $this->title = $model->title;
 $this->params['breadcrumbs'][] = ['label' => 'Products', 'url' => ['index']];
@@ -30,14 +31,48 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'title',
+            'brandName',
             'description',
             'price',
             'amount',
             'categoryName',
-            'brandName',
+        ],
+    ]) ?>
+
+    <?= DetailView::widget([
+        'model' => $model,
+        'attributes' => $model->getDetailedFeatures(),
+    ]) ?>
+
+    <?= DetailView::widget([
+        'model' => $model,
+        'attributes' => [
             'created_at',
             'updated_at',
         ],
     ]) ?>
+
+<!--    TODO: DONT FORMAT THIS PAGE, IT CONTAINS COMMENTED CODE IN PHPDOC, KOSTYL PIZDEC BTW.   -->
+    <?php /**
+    <?= DetailView::widget([
+        'model' => $model,
+        'attributes' => array_merge(
+            [
+                'id',
+                'title',
+                'brandName',
+                'description',
+                'price',
+                'amount',
+                'categoryName',
+            ],
+            $model->getDetailedFeatures(),
+            [
+                'created_at',
+                'updated_at',
+            ]
+        ),
+    ]) ?>
+ */?>
 
 </div>

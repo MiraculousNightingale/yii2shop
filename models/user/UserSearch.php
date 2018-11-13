@@ -1,16 +1,16 @@
 <?php
 
-namespace app\models;
+namespace app\models\user;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Brand;
 
 /**
- * BrandSearch represents the model behind the search form of `app\models\Brand`.
+ * UserSearch represents the model behind the search form of `app\models\User`.
+ * @property mixed status
  */
-class BrandSearch extends Brand
+class UserSearch extends User
 {
     /**
      * {@inheritdoc}
@@ -18,8 +18,8 @@ class BrandSearch extends Brand
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['name', 'contact'], 'safe'],
+            [['id', 'status', 'role'], 'integer'],
+            [['email', 'username', 'hash', 'salt', 'auth_key', 'access_token', 'verification_token'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class BrandSearch extends Brand
      */
     public function search($params)
     {
-        $query = Brand::find();
+        $query = User::find();
 
         // add conditions that should always apply here
 
@@ -60,10 +60,12 @@ class BrandSearch extends Brand
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'status' => $this->status,
+            'role' => $this->role,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'contact', $this->contact]);
+        $query->andFilterWhere(['like', 'email', $this->email])
+            ->andFilterWhere(['like', 'username', $this->username]);
 
         return $dataProvider;
     }

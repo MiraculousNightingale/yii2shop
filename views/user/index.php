@@ -1,12 +1,14 @@
 <?php
 
-use app\models\User;
+use app\models\user\User;
+use app\models\user\UserSearch;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\UserSearch */
-/* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $searchModel UserSearch */
+/* @var $dataProvider ActiveDataProvider */
 
 $this->title = 'Users';
 $this->params['breadcrumbs'][] = $this->title;

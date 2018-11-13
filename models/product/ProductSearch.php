@@ -1,11 +1,11 @@
 <?php
 
-namespace app\models;
+namespace app\models\product;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Product;
+use app\models\product\Product;
 use yii\db\ActiveQuery;
 
 /**
@@ -99,7 +99,7 @@ class ProductSearch extends Product
             ->andFilterWhere(['like', 'created_at', $this->created_at])
             ->andFilterWhere(['like', 'updated_at', $this->updated_at]);
 
-//      related field for  brandName property
+//      related field for brandName property
         $query->joinWith(['brand' => function ($q) {
             /** @var ActiveQuery $q */
             $q->where(['like', 'brand.name', isset($this->brandName) ? $this->brandName : '']);

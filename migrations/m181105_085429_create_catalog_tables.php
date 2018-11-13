@@ -22,6 +22,7 @@ class m181105_085429_create_catalog_tables extends Migration
             'brand_id' => $this->integer(11)->unsigned(),
             'created_at' => $this->string(16),
             'updated_at' => $this->string(16),
+            'image' => $this->string(64),
         ]);
 
         $this->createTable('brand', [
@@ -38,13 +39,19 @@ class m181105_085429_create_catalog_tables extends Migration
         $this->createTable('feature', [
             'id' => $this->primaryKey(11)->unsigned(),
             'name' => $this->string(32),
-            'value' => $this->string(16)
         ]);
 
         $this->createTable('category_feature', [
             'id' => $this->primaryKey(11)->unsigned(),
             'category_id' => $this->integer(11)->unsigned(),
             'feature_id' => $this->integer(11)->unsigned()
+        ]);
+
+        $this->createTable('product_feature',[
+            'id' => $this->primaryKey(11)->unsigned(),
+            'product_id' => $this->integer(11)->unsigned(),
+            'feature_id'=>$this->integer(11)->unsigned(),
+            'value' => $this->string(16)->unsigned(),
         ]);
     }
 

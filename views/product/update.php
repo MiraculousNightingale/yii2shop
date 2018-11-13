@@ -1,9 +1,10 @@
 <?php
 
+use app\models\product\Product;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Product */
+/* @var $model Product */
 
 $this->title = 'Update Product: ' . $model->title;
 $this->params['breadcrumbs'][] = ['label' => 'Products', 'url' => ['index']];
