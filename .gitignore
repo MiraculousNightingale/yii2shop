@@ -35,3 +35,6 @@ tests/_support/_generated
 #temporary files
 mail/user-verify-text.php
 models/UserExtra.php
+
+#uploads folder
+web/uploads

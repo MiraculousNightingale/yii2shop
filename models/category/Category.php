@@ -27,7 +27,6 @@ use yii\db\ActiveRecord;
  * @property $feature_ids
  *
  * @property string $featureString
- * @property string[] $featureNames
  */
 class Category extends ActiveRecord
 {

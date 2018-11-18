@@ -2,17 +2,18 @@
 
 namespace app\controllers;
 
+
 use app\models\category\Category;
 use app\models\product\ProductSearch;
 use app\models\product\ProductFeatureForm;
 use app\models\product\ProductForm;
 use Yii;
 use app\models\product\Product;
-use yii\base\DynamicModel;
+use yii\base\Model;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\UploadedFile;
+
 
 /**
  * ProductController implements the CRUD actions for Product model.
@@ -66,26 +67,25 @@ class ProductController extends Controller
      * Creates a create Product model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
+     * @throws \Exception
      */
     public function actionCreate()
     {
-        $product = new Product();
-
         $productForm = new ProductForm();
         $featureForm = new ProductFeatureForm();
 
         if ($productForm->load(Yii::$app->request->post())) {
             //Check if the submit was partial, only to load a different category.
             if ($productForm->loadsCategory()) {
-                $featureForm = new ProductFeatureForm($productForm->category_id);
+                $featureForm = new ProductFeatureForm($productForm->category);
                 return $this->render('create', [
                     'product' => $productForm,
                     'features' => $featureForm,
                 ]);
             }
 
-            if ($featureForm->load(Yii::$app->request->post()) && $product->saveWithForms($productForm, $featureForm)) {
-                return $this->redirect(['view', 'id' => $product->id]);
+            if ($featureForm->load(Yii::$app->request->post()) && $product_id = $productForm->save($featureForm)) {
+                return $this->redirect(['view', 'id' => $product_id]);
             }
 
         }
@@ -102,17 +102,36 @@ class ProductController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
+     * @throws \Exception
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $productForm = new ProductForm($this->findModel($id));
+        $featureForm = new ProductFeatureForm($productForm->category, $productForm->source);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($productForm->load(Yii::$app->request->post())) {
+            //Check if the submit was partial, only to load a different category.
+            if ($productForm->loadsCategory()) {
+                $featureForm = $productForm->loadsSourceCategory()
+                    ? new ProductFeatureForm($productForm->category, $productForm->source)
+                    : new ProductFeatureForm($productForm->category);
+                return $this->render('update', [
+                    'product' => $productForm,
+                    'features' => $featureForm,
+                ]);
+            }
+
+            //TODO: Fix update bug >> Updating requires two times to actually update the features.
+            $featureForm->load(Yii::$app->request->post());
+            if ($product_id = $productForm->update($featureForm)) {
+                return $this->redirect(['view', 'id' => $product_id]);
+            }
+
         }
 
         return $this->render('update', [
-            'model' => $model,
+            'product' => $productForm,
+            'features' => $featureForm,
         ]);
     }
 

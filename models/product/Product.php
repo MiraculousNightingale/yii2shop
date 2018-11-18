@@ -7,13 +7,10 @@ use app\models\brand\Brand;
 use app\models\category\Category;
 use app\models\feature\Feature;
 use app\models\OrderItem;
-use voskobovich\behaviors\ManyToManyBehavior;
-use Yii;
-use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\web\UploadedFile;
+
 
 /**
  * This is the model class for table "product".
@@ -106,32 +103,6 @@ class Product extends ActiveRecord
     }
 
     /**
-     * @param ProductForm $productForm
-     * @param ProductFeatureForm $featureForm
-     * @param bool $runValidation
-     * @return bool
-     */
-    public function saveWithForms($productForm, $featureForm, $runValidation = true)
-    {
-        $this->title = $productForm->title;
-        $this->brand_id = $productForm->brand_id;
-        $this->description = $productForm->description;
-        $this->price = $productForm->price;
-        $this->amount = $productForm->amount;
-        $this->category_id = $productForm->category_id;
-        if ($this->save($runValidation)) {
-            $imageFile = UploadedFile::getInstance($productForm, 'imageFile');
-            $this->image = 'uploads/' . $imageFile->baseName . '.' . $imageFile->extension;
-            $imageFile->saveAs($this->image);
-            foreach ($featureForm->attributes as $name => $value) {
-                $this->link('features', Feature::find()->where(['name' => $name])->one(), ['value' => $value]);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * @return \yii\db\ActiveQuery
      */
     public function getOrderItems()
@@ -173,12 +144,21 @@ class Product extends ActiveRecord
         return $this->hasMany(ProductFeature::className(), ['product_id' => 'id']);
     }
 
+    public function getFeaturesAsAttributes()
+    {
+        $features = [];
+        foreach ($this->features as $feature) {
+            $features[$feature->name] = $feature->value;
+        }
+        return $features;
+    }
+
     /**
      * @return ActiveQuery
      */
     public function getCategoryFeatures()
     {
-        return $this->hasMany(Feature::className(), ['id' => 'feature_id'])->via('productFeatures');
+        return $this->hasMany(Feature::className(), ['id' => 'feature_id'])->via('features');
     }
 
     /**

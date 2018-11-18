@@ -11,7 +11,9 @@ namespace app\models\product;
 
 use app\models\brand\Brand;
 use app\models\category\Category;
-use yii\base\DynamicModel;
+use yii\base\Model;
+use yii\helpers\Url;
+use yii\web\UploadedFile;
 
 /**
  * Model ProductForm - form behind the Product Create/Update action.
@@ -19,10 +21,29 @@ use yii\base\DynamicModel;
  *
  * @property Category $category
  */
-class ProductForm extends DynamicModel
+class ProductForm extends Model
 {
+//    General
     public $imageFile, $title, $description, $price, $amount, $category_id, $brand_id;
+//    Only on update
+    public $source, $id, $imagePreview;
+//    Utility
     public $loadCategory;
+
+    /**
+     * ProductForm constructor.
+     * @param Product|null $product
+     */
+    public function __construct($product = null)
+    {
+        parent::__construct();
+        if ($product) {
+            $this->source = $product;
+            $this->id = $product->id;
+            $this->imagePreview = $product->image;
+            $this->setAttributes($product->attributes);
+        }
+    }
 
     /**
      * @inheritdoc
@@ -30,6 +51,7 @@ class ProductForm extends DynamicModel
     public function rules()
     {
         return [
+            [['id'], 'integer'],
             [['price'], 'number'],
             [['amount', 'category_id', 'brand_id'], 'integer'],
             [['title'], 'string', 'max' => 32],
@@ -39,10 +61,15 @@ class ProductForm extends DynamicModel
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::className(), 'targetAttribute' => ['category_id' => 'id']],
             [['title', 'description', 'price', 'amount'], 'required'],
             [['imageFile'], 'image'],
+            [['imagePreview'], 'safe'],
             [['loadCategory'], 'boolean'],
         ];
     }
 
+    /**
+     * Perform a check if this form loads category features after user selected a category.
+     * @return bool
+     */
     public function loadsCategory()
     {
         if ($this->loadCategory) {
@@ -50,6 +77,66 @@ class ProductForm extends DynamicModel
             return true;
         }
         return false;
+    }
+
+    public function loadsSourceCategory()
+    {
+        if ($this->category_id == $this->source->category_id)
+            return true;
+        return false;
+    }
+
+    /**
+     * @param ProductFeatureForm $featureForm
+     * @param bool $runValidation
+     * @return int|bool if saved successfully return saved product id, else return false
+     */
+    public function save($featureForm, $runValidation = true)
+    {
+        $product = new Product();
+        $product->setAttributes($this->attributes);
+
+        if ($this->imageFile) {
+            $imageFile = UploadedFile::getInstance($this, 'imageFile');
+            $product->image = 'uploads/' . $imageFile->baseName . '.' . $imageFile->extension;
+        }
+
+        if ($product->save($runValidation) && $featureForm->save($product)) {
+            if (isset($imageFile)) $imageFile->saveAs($product->image);
+            return $product->id;
+        }
+        return false;
+    }
+
+    /**
+     * @param ProductFeatureForm $featureForm
+     * @param bool $runValidation
+     * @return bool|int
+     */
+    public function update($featureForm, $runValidation = true)
+    {
+        $product = $this->source;
+        $product->setAttributes($this->attributes);
+
+        if ($this->imageFile) {
+            $imageFile = UploadedFile::getInstance($this, 'imageFile');
+            $product->image = 'uploads/' . $imageFile->baseName . '.' . $imageFile->extension;
+        }
+
+        if ($product->save($runValidation) && $featureForm->update($product)) {
+            if (isset($imageFile)) $imageFile->saveAs($product->image);
+            return $product->id;
+        }
+        \Yii::$app->session->setFlash('danger','ProductForm Update failed.');
+        return false;
+    }
+
+    /**
+     * @return null|Category
+     */
+    public function getCategory()
+    {
+        return Category::findOne($this->category_id);
     }
 
 }
