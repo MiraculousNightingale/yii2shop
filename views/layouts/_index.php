@@ -4,6 +4,7 @@
 
 /* @var $content string */
 
+use app\models\category\Category;
 use app\models\User;
 use app\widgets\Alert;
 use yii\helpers\Html;
@@ -48,7 +49,6 @@ AppAsset::register($this);
                     ['label' => 'Manage Users', 'url' => ['/user/index'], 'options' => ['class' => 'btn-info']],
                     ['label' => 'Manage Products', 'url' => ['/product/index']],
                     ['label' => 'Manage Brands', 'url' => ['/brand/index']],
-                    ['label' => 'Manage Features', 'url' => ['/feature/index']],
                     ['label' => 'Manage Categories', 'url' => ['/category/index']],
                 ],
             ],
@@ -69,12 +69,14 @@ AppAsset::register($this);
     NavBar::end();
     ?>
 
-    <div class="container">
+    <div class="container col-lg-12">
         <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
         ]) ?>
         <?= Alert::widget() ?>
+
         <?= $content ?>
+
     </div>
 </div>
 

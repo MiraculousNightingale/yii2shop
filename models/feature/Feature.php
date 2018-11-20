@@ -3,6 +3,7 @@
 namespace app\models\feature;
 
 use app\models\category\CategoryFeature;
+use app\models\product\ProductFeature;
 use yii\db\ActiveRecord;
 
 /**

@@ -2,52 +2,67 @@
 
 /* @var $this yii\web\View */
 
+use app\models\category\Category;
+use app\models\product\ProductSearch;
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+use yii\widgets\ListView;
+
 $this->title = 'My Yii Application';
+
+/* @var ProductSearch $searchModel */
 ?>
 <div class="site-index">
 
-    <div class="jumbotron">
-        <h1>Congratulations!</h1>
+    <div class="side-bar pull-left col-lg-2">
+        <?php $form = ActiveForm::begin([
+            'id' => 'filter-form',
+            'action' => ['index'],
+            'method' => 'get',
+        ]) ?>
 
-        <p class="lead">You have successfully created your Yii-powered application.</p>
+        <h4>Filters</h4>
+        <h5>Category:</h5>
+        <ul>
+            <li><?= Html::a('All', '#', ['name' => '', 'onclick' => 'categoryFilter(this)']) ?></li>
+            <?php foreach (Category::find()->all() as $category): ?>
+                <li>
+                    <?= Html::a($category->name, '#', ['name' => $category->name, 'onclick' => 'categoryFilter(this)']) ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+        <div class="hidden"><?= $form->field($searchModel, 'categoryName')->textInput(['id' => 'category-input']) ?></div>
+        <?= $form->field($searchModel, 'title')->textInput() ?>
 
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
+        <?= $form->field($searchModel, 'fromPrice')->textInput() ?>
+
+        <?= $form->field($searchModel, 'toPrice')->textInput() ?>
+
+
+        <?= Html::submitButton('Search', ['class' => 'btn btn-success']) ?>
+        <?= Html::resetButton('Reset', ['class' => 'btn btn-default']) ?>
+
+        <?php ActiveForm::end() ?>
     </div>
 
-    <div class="body-content">
+    <?= ListView::widget([
+        'dataProvider' => $dataProvider,
+        'options' => [
+            'tag' => 'div',
+            'class' => 'list-wrapper product-list',
+            'id' => 'list-wrapper',
+        ],
+        'layout' => "{pager}\n{items}\n{summary}",
+        'itemView' => '/product/_product',
+    ]) ?>
 
-        <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
-            </div>
-        </div>
-
-    </div>
 </div>
+
+<script>
+    var categoryFilter = function (eventCaller) {
+        var form = document.getElementById('filter-form');
+        var categoryInput = document.getElementById('category-input');
+        categoryInput.value = eventCaller.getAttribute('name');
+        form.submit();
+    }
+</script>

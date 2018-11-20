@@ -41,7 +41,7 @@ class ProductForm extends Model
             $this->source = $product;
             $this->id = $product->id;
             $this->imagePreview = $product->image;
-            $this->setAttributes($product->attributes);
+            $this->setAttributes($product->attributes, false);
         }
     }
 
@@ -96,13 +96,12 @@ class ProductForm extends Model
         $product = new Product();
         $product->setAttributes($this->attributes);
 
-        if ($this->imageFile) {
-            $imageFile = UploadedFile::getInstance($this, 'imageFile');
+        if ($imageFile = UploadedFile::getInstance($this, 'imageFile')) {
             $product->image = 'uploads/' . $imageFile->baseName . '.' . $imageFile->extension;
         }
 
         if ($product->save($runValidation) && $featureForm->save($product)) {
-            if (isset($imageFile)) $imageFile->saveAs($product->image);
+            if ($imageFile) $imageFile->saveAs($product->image);
             return $product->id;
         }
         return false;
@@ -118,16 +117,15 @@ class ProductForm extends Model
         $product = $this->source;
         $product->setAttributes($this->attributes);
 
-        if ($this->imageFile) {
-            $imageFile = UploadedFile::getInstance($this, 'imageFile');
+        if ($imageFile = UploadedFile::getInstance($this, 'imageFile')) {
             $product->image = 'uploads/' . $imageFile->baseName . '.' . $imageFile->extension;
         }
 
         if ($product->save($runValidation) && $featureForm->update($product)) {
-            if (isset($imageFile)) $imageFile->saveAs($product->image);
+            if ($imageFile) $imageFile->saveAs($product->image);
             return $product->id;
         }
-        \Yii::$app->session->setFlash('danger','ProductForm Update failed.');
+        \Yii::$app->session->setFlash('danger', 'ProductForm Update failed.');
         return false;
     }
 

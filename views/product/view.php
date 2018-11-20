@@ -26,6 +26,11 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
     </p>
 
+    <div class="form-group">
+    <h4 class="text-center">Product thumbnail</h4>
+    <img class="img-thumbnail center-block col-lg-6" id="preview" src="<?= $model->image ?>">
+    </div>
+
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
@@ -36,6 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'price',
             'amount',
             'categoryName',
+            'image',
         ],
     ]) ?>
 
@@ -52,27 +58,27 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
-<!--    TODO: DONT FORMAT THIS PAGE, IT CONTAINS COMMENTED CODE IN PHPDOC, KOSTYL PIZDEC BTW.   -->
+    <!--    TODO: DONT FORMAT THIS PAGE, IT CONTAINS COMMENTED CODE IN PHPDOC, KOSTYL PIZDEC BTW.   -->
     <?php /**
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => array_merge(
-            [
-                'id',
-                'title',
-                'brandName',
-                'description',
-                'price',
-                'amount',
-                'categoryName',
-            ],
-            $model->getDetailedFeatures(),
-            [
-                'created_at',
-                'updated_at',
-            ]
-        ),
-    ]) ?>
- */?>
+     * <?= DetailView::widget([
+     * 'model' => $model,
+     * 'attributes' => array_merge(
+     * [
+     * 'id',
+     * 'title',
+     * 'brandName',
+     * 'description',
+     * 'price',
+     * 'amount',
+     * 'categoryName',
+     * ],
+     * $model->getDetailedFeatures(),
+     * [
+     * 'created_at',
+     * 'updated_at',
+     * ]
+     * ),
+     * ]) ?>
+     */ ?>
 
 </div>

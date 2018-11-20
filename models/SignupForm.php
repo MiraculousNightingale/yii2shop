@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\models\user\User;
 use Yii;
 use yii\base\Model;
 

@@ -47,10 +47,10 @@ class m181105_085429_create_catalog_tables extends Migration
             'feature_id' => $this->integer(11)->unsigned()
         ]);
 
-        $this->createTable('product_feature',[
+        $this->createTable('product_feature', [
             'id' => $this->primaryKey(11)->unsigned(),
             'product_id' => $this->integer(11)->unsigned(),
-            'feature_id'=>$this->integer(11)->unsigned(),
+            'feature_id' => $this->integer(11)->unsigned(),
             'value' => $this->string(16)->unsigned(),
         ]);
     }

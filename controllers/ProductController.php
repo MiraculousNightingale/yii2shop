@@ -4,6 +4,7 @@ namespace app\controllers;
 
 
 use app\models\category\Category;
+use app\models\comment\Comment;
 use app\models\product\ProductSearch;
 use app\models\product\ProductFeatureForm;
 use app\models\product\ProductForm;
@@ -121,9 +122,8 @@ class ProductController extends Controller
                 ]);
             }
 
-            //TODO: Fix update bug >> Updating requires two times to actually update the features.
-            $featureForm->load(Yii::$app->request->post());
-            if ($product_id = $productForm->update($featureForm)) {
+            $featureForm = new ProductFeatureForm($productForm->category);
+            if ($product_id = $productForm->update($featureForm) && $featureForm->load(Yii::$app->request->post())) {
                 return $this->redirect(['view', 'id' => $product_id]);
             }
 
@@ -151,6 +151,18 @@ class ProductController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @param $id
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionDetaliedView($id)
+    {
+        $product = $this->findModel($id);
+        $comment = new Comment();
+        return $this->render('_detailed', ['product' => $product, 'comment' => $comment]);
     }
 
     /**

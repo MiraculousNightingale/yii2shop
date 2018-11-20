@@ -12,6 +12,8 @@ use yii\db\ActiveQuery;
  * ProductSearch represents the model behind the search form of `app\models\Product`.
  * @property string $brandName
  * @property string $categoryName
+ * @property float $fromPrice
+ * @property float $toPrice
  */
 class ProductSearch extends Product
 {
@@ -20,6 +22,7 @@ class ProductSearch extends Product
      */
     public $brandName;
     public $categoryName;
+    public $fromPrice, $toPrice;
 
     public function rules()
     {
@@ -28,6 +31,7 @@ class ProductSearch extends Product
             [['title', 'description', 'created_at', 'updated_at'], 'safe'],
             [['price'], 'number'],
             [['brandName', 'categoryName'], 'safe'],
+            [['fromPrice', 'toPrice'],'number'],
         ];
     }
 
@@ -93,6 +97,9 @@ class ProductSearch extends Product
             'category_id' => $this->category_id,
             'brand_id' => $this->brand_id,
         ]);
+
+        $query->andFilterWhere(['>=','price',$this->fromPrice])
+            ->andFilterWhere(['<=','price',$this->toPrice]);
 
         $query->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere(['like', 'description', $this->description])

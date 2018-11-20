@@ -5,6 +5,7 @@ namespace app\models\product;
 
 use app\models\brand\Brand;
 use app\models\category\Category;
+use app\models\comment\Comment;
 use app\models\feature\Feature;
 use app\models\OrderItem;
 use yii\behaviors\TimestampBehavior;
@@ -32,6 +33,7 @@ use yii\db\ActiveRecord;
  * @property string $categoryName
  * @property Feature[] $categoryFeatures
  * @property ProductFeature[] $features
+ * @property Comment[] $comments
  *
  * @property string $image
  */
@@ -134,6 +136,11 @@ class Product extends ActiveRecord
     public function getCategoryName()
     {
         return $this->category->name;
+    }
+
+    public function getComments()
+    {
+        return $this->hasMany(Comment::className(), ['product_id' => 'id']);
     }
 
     /**

@@ -2,9 +2,12 @@
 
 namespace app\controllers;
 
+
+use app\models\product\ProductSearch;
 use app\models\SignupForm;
-use app\models\User;
+use app\models\user\User;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
@@ -59,11 +62,18 @@ class SiteController extends Controller
     /**
      * Displays homepage.
      *
+     * @param null|string $category
      * @return string
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $this->layout='_index';
+        $searchModel = new ProductSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
     /**
@@ -156,10 +166,10 @@ class SiteController extends Controller
             if ($user->verify()) {
                 Yii::$app->session->setFlash('success', 'Account verified!');
                 Yii::$app->user->login($user);
-                return $this->render('index');
+                return $this->render('about');
             }
         Yii::$app->session->setFlash('danger', 'Invalid token.');
-        return $this->render('index');
+        return $this->render('about');
     }
 
     /**
