@@ -105,7 +105,6 @@ class CategorySearch extends Category
             else
                 $query->andFilterHaving(['SUM(product.amount)' => $this->productAmount]);
 
-//                echo $query->createCommand()->rawSql; die;
 
         return $dataProvider;
     }

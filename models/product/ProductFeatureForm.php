@@ -34,8 +34,6 @@ class ProductFeatureForm extends DynamicModel
                 }
             }
         } else {
-            echo 'Somehow we got here...';
-            die;
             parent::__construct(Category::find()->one()->getFeatureNames(), $config);
         }
         $this->generateRules();
@@ -55,16 +53,17 @@ class ProductFeatureForm extends DynamicModel
      */
     public function save($product)
     {
-//        try {
-        foreach ($this->attributes as $name => $value) {
-            $product->link('categoryFeatures', Feature::find()->where(['name' => $name])->one(), ['value' => $value]);
-            echo $name . ' ' . $value . '<br>';
-        }
+        try {
+            foreach ($this->attributes as $name => $value) {
+                $product->link('categoryFeatures', Feature::find()->where(['name' => $name])->one(), ['value' => $value]);
+//            TODO: Remove debug code.
+//            echo $name . ' ' . $value . '<br>';
+            }
 //            die;
-        return true;
-//        } catch (\Exception $e) {
-//            return false;
-//    }
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
@@ -74,20 +73,21 @@ class ProductFeatureForm extends DynamicModel
     public
     function update($product)
     {
-//        try {
-        foreach ($product->getFeaturesAsAttributes() as $name => $value) {
-            $product->unlink('categoryFeatures', Feature::find()->where(['name' => $name])->one(), true);
-            echo $name . ' ' . $value . '<br>';
-        }
+        try {
+            foreach ($product->getFeaturesAsAttributes() as $name => $value) {
+                $product->unlink('categoryFeatures', Feature::find()->where(['name' => $name])->one(), true);
+                echo $name . ' ' . $value . '<br>';
+            }
+//        TODO: Remove debug code. 2
 //        foreach ($this->attributes as $name => $value) {
 //            $product->link('categoryFeatures', Feature::find()->where(['name' => $name])->one(), ['value' => $value]);
 //            echo $name . ' ' . $value . '<br>';
 //        }
 //            die;
-        $this->save($product);
-        return true;
-//        } catch (\Exception $e) {
-//            return false;
-//        }
+            $this->save($product);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

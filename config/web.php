@@ -5,6 +5,7 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
+    'name'=>'Peace Date Yii Shop',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [

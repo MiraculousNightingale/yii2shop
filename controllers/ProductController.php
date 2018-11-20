@@ -123,7 +123,7 @@ class ProductController extends Controller
             }
 
             $featureForm = new ProductFeatureForm($productForm->category);
-            if ($product_id = $productForm->update($featureForm) && $featureForm->load(Yii::$app->request->post())) {
+            if ($featureForm->load(Yii::$app->request->post()) && $product_id = $productForm->update($featureForm)) {
                 return $this->redirect(['view', 'id' => $product_id]);
             }
 
