@@ -31,7 +31,7 @@ class ProductSearch extends Product
             [['title', 'description', 'created_at', 'updated_at'], 'safe'],
             [['price'], 'number'],
             [['brandName', 'categoryName'], 'safe'],
-            [['fromPrice', 'toPrice'],'number'],
+            [['fromPrice', 'toPrice'], 'number'],
         ];
     }
 
@@ -98,25 +98,22 @@ class ProductSearch extends Product
             'brand_id' => $this->brand_id,
         ]);
 
-        $query->andFilterWhere(['>=','price',$this->fromPrice])
-            ->andFilterWhere(['<=','price',$this->toPrice]);
+        $query->andFilterWhere(['>=', 'price', $this->fromPrice])
+            ->andFilterWhere(['<=', 'price', $this->toPrice]);
 
         $query->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere(['like', 'description', $this->description])
             ->andFilterWhere(['like', 'created_at', $this->created_at])
             ->andFilterWhere(['like', 'updated_at', $this->updated_at]);
 
-//      related field for brandName property
-        $query->joinWith(['brand' => function ($q) {
-            /** @var ActiveQuery $q */
-            $q->where(['like', 'brand.name', isset($this->brandName) ? $this->brandName : '']);
-        }]);
+        //related field for brandName property
+        $query->joinWith('brand');
+        $query->andFilterWhere(['like', 'brand.name', $this->brandName]);
 
-//      related field for categoryName property
-        $query->joinWith(['category' => function ($q) {
-            /** @var ActiveQuery $q */
-            $q->where(['like', 'category.name', isset($this->categoryName) ? $this->categoryName : '']);
-        }]);
+
+        //related field for categoryName property
+        $query->joinWith('category');
+        $query->andFilterWhere(['like', 'category.name', $this->categoryName]);
 
         return $dataProvider;
     }

@@ -49,6 +49,7 @@ AppAsset::register($this);
                     ['label' => 'Manage Users', 'url' => ['/user/index'], 'options' => ['class' => 'btn-info']],
                     ['label' => 'Manage Products', 'url' => ['/product/index']],
                     ['label' => 'Manage Brands', 'url' => ['/brand/index']],
+                    ['label' => 'Manage Features', 'url' => ['/feature/index']],
                     ['label' => 'Manage Categories', 'url' => ['/category/index']],
                 ],
             ],

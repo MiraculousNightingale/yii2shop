@@ -88,25 +88,24 @@ class CategorySearch extends Category
 
         $query->andFilterWhere(['like', 'name', $this->name]);
 
-        //related field for productCount property
-        $query->joinWith(['products' => function ($q) {
-            /** @var ActiveQuery $q */
-            $q->groupBy('product.id');
-            if (is_numeric($this->productCount))
-                $q->having(['COUNT(product.id)' => $this->productCount]);
-        }]);
+        //filtration for related fields
+        $query->joinWith('products');
 
-        //related field for categoryName property
-        $query->joinWith(['products' => function ($q) {
-            /** @var ActiveQuery $q */
-            $q->groupBy('product.id');
-            if (is_numeric($this->productAmount))
-                //if searching for 0, and record's productCount==0 SQL will return nothing, so we need an explicit query
-                if ($this->productAmount == 0)
-                    $q->having(['COUNT(product.id)' => 0])->orHaving(['SUM(product.amount)' => $this->productAmount]);
-                else
-                    $q->having(['SUM(product.amount)' => $this->productAmount]);
-        }]);
+        $query->groupBy('product.category_id');
+
+        //related field for productCount property
+        if (is_numeric($this->productCount))
+        $query->andFilterHaving(['COUNT(product.id)' => $this->productCount]);
+
+        //related field for productAmount property
+        if (is_numeric($this->productAmount))
+            //if searching for 0, and record's productCount==0 SQL will return nothing, so we need an explicit query
+            if ($this->productAmount == 0)
+                $query->andFilterHaving(['COUNT(product.id)' => 0])->orFilterHaving(['SUM(product.amount)' => $this->productAmount]);
+            else
+                $query->andFilterHaving(['SUM(product.amount)' => $this->productAmount]);
+
+//                echo $query->createCommand()->rawSql; die;
 
         return $dataProvider;
     }
