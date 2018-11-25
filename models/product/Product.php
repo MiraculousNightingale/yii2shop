@@ -7,7 +7,8 @@ use app\models\brand\Brand;
 use app\models\category\Category;
 use app\models\comment\Comment;
 use app\models\feature\Feature;
-use app\models\OrderItem;
+use app\models\order\Order;
+use app\models\order\OrderItem;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -34,6 +35,8 @@ use yii\db\ActiveRecord;
  * @property Feature[] $categoryFeatures
  * @property ProductFeature[] $features
  * @property Comment[] $comments
+ *
+ * @property array $feature
  *
  * @property string $image
  */
@@ -160,12 +163,22 @@ class Product extends ActiveRecord
         return $features;
     }
 
+    public function getFeature()
+    {
+        return $this->getFeaturesAsAttributes();
+    }
+
     /**
      * @return ActiveQuery
      */
     public function getCategoryFeatures()
     {
         return $this->hasMany(Feature::className(), ['id' => 'feature_id'])->via('features');
+    }
+
+    public function getOrders()
+    {
+        return $this->hasMany(Order::className(), ['id'=>'order_id'])->via('orderItems');
     }
 
     /**

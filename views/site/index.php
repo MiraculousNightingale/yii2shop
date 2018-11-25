@@ -22,7 +22,9 @@ $this->title = 'My Yii Application';
         ]) ?>
 
         <h4>Filters</h4>
-        <h5>Category:</h5>
+
+        <?= $form->field($searchModel, 'categoryName')->hiddenInput(['id' => 'category-input']) ?>
+
         <ul>
             <li><?= Html::a('All', '#', ['name' => '', 'onclick' => 'categoryFilter(this)']) ?></li>
             <?php foreach (Category::find()->all() as $category): ?>
@@ -31,13 +33,25 @@ $this->title = 'My Yii Application';
                 </li>
             <?php endforeach; ?>
         </ul>
-        <div class="hidden"><?= $form->field($searchModel, 'categoryName')->textInput(['id' => 'category-input']) ?></div>
+
+        <?= $form->field($searchModel, 'brandName')->textInput() ?>
+
         <?= $form->field($searchModel, 'title')->textInput() ?>
 
         <?= $form->field($searchModel, 'fromPrice')->textInput() ?>
 
         <?= $form->field($searchModel, 'toPrice')->textInput() ?>
 
+        <!--    Planned as feature filter, but implementation is way too difficult    -->
+        <?php if (/*$searchModel->categoryName*/ 0 == 1): ?>
+
+            <h4>Feature filters</h4>
+
+            <?php foreach (Category::findOne(['name' => $searchModel->categoryName])->features as $feature): ?>
+                <h3><?= $feature->name ?></h3>
+            <?php endforeach; ?>
+
+        <?php endif; ?>
 
         <?= Html::submitButton('Search', ['class' => 'btn btn-success']) ?>
         <?= Html::resetButton('Reset', ['class' => 'btn btn-default']) ?>
@@ -52,7 +66,7 @@ $this->title = 'My Yii Application';
             'class' => 'list-wrapper product-list',
             'id' => 'list-wrapper',
         ],
-        'layout' => "{pager}\n{items}\n{summary}",
+        'layout' => "{items}\n{pager}\n{summary}",
         'itemView' => '/product/_product',
     ]) ?>
 

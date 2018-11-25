@@ -2,10 +2,13 @@
 
 use app\models\comment\Comment;
 use app\models\product\Product;
+use app\models\user\User;
 use yii\helpers\Html;
 
 /* @var Product $product */
 /* @var Comment $comment */
+/* @var User $user */
+$user = Yii::$app->user->identity;
 
 ?>
 
@@ -15,7 +18,12 @@ use yii\helpers\Html;
     <img class="thumbnail" src="<?= $product->image ?>">
     <div class="center-block clearfix panel panel-body">
         <h3 class="text-right">Price: <?= $product->price ?> UAH</h3>
-        <?= Html::a('Add to cart', ['product/detalied-view', 'id' => $product->id], ['class' => 'btn btn-success pull-right ']) ?>
+        <?php if ($user->cart->hasItem($product->id)) {
+            echo Html::button('In cart', ['class' => 'text-right btn btn-success disabled pull-right']);
+        } else {
+            echo Html::a('Add to cart', ['order/add-to-cart', 'productId' => $product->id], ['class' => 'text-right btn btn-info pull-right']);
+        }
+        ?>
     </div>
     <article class="panel panel-body panel-info">
         <h3>Description</h3>
@@ -29,6 +37,10 @@ use yii\helpers\Html;
             </li>
         <?php endforeach; ?>
     </ul>
+</div>
+
+<div>
+
 </div>
 
 <div class="comment-list panel panel-body panel-group">

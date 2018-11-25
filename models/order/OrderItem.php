@@ -1,7 +1,8 @@
 <?php
 
-namespace app\models;
+namespace app\models\order;
 
+use app\models\product\Product;
 use Yii;
 use yii\db\ActiveRecord;
 
@@ -15,6 +16,8 @@ use yii\db\ActiveRecord;
  *
  * @property Order $order
  * @property Product $product
+ *
+ * @property float $price
  */
 class OrderItem extends ActiveRecord
 {
@@ -65,5 +68,10 @@ class OrderItem extends ActiveRecord
     public function getProduct()
     {
         return $this->hasOne(Product::className(), ['id' => 'product_id']);
+    }
+
+    public function getPrice()
+    {
+        return $this->amount * $this->product->price;
     }
 }

@@ -14,7 +14,6 @@ class m181105_090908_create_order_tables extends Migration
     {
         $this->createTable('order', [
             'id' => $this->primaryKey(11)->unsigned(),
-            'price' => $this->float(2)->unsigned(),
             'description' => $this->string(255),
             'status' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0),
             'delivery_type' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0),

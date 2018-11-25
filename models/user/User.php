@@ -2,6 +2,7 @@
 
 namespace app\models\user;
 
+use app\models\order\Order;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\web\Cookie;
@@ -20,16 +21,21 @@ use yii\web\IdentityInterface;
  * @property string $access_token
  * @property string $verification_token
  * @property string $status
+ *
+ * @property Order[] $orders
+ * @property Order $cart
  */
 class User extends ActiveRecord implements IdentityInterface
 {
 
-    const STATUS_INACTIVE = 0;
-    const STATUS_ACTIVE = 1;
+    const
+        STATUS_INACTIVE = 0,
+        STATUS_ACTIVE = 1;
 
-    const ROLE_USER = 0;
-    const ROLE_ADMIN = 1;
-    const ROLE_OVERLORD = 2;
+    const
+        ROLE_USER = 0,
+        ROLE_ADMIN = 1,
+        ROLE_OVERLORD = 2;
 
     public $password;
 
@@ -199,8 +205,29 @@ class User extends ActiveRecord implements IdentityInterface
         return self::getStatuses()[$this->status];
     }
 
+    public function getOrders()
+    {
+        return $this->hasMany(Order::className(), ['user_id' => 'id']);
+    }
+
     /**
-     * @param string $authKey
+     * @return Order Returns cart for current user or null if such was not defined;
+     * @throws \Exception
+     */
+    public function getCart()
+    {
+        if ($cart = Order::findOne(['user_id' => $this->id, 'status' => Order::STATUS_CART])) {
+            return $cart;
+        }
+        //If no cart exists, create and return it.
+        $cart = new Order();
+        $cart->link('user', $this);
+        return $this->getCart();
+    }
+
+
+    /**
+     * @param string $auth Key
      * @return bool if auth key is valid for current user
      */
     public function validateAuthKey($authKey)
@@ -252,6 +279,16 @@ class User extends ActiveRecord implements IdentityInterface
         $this->verification_token = null;
         $this->status = User::STATUS_ACTIVE;
         return $this->save();
+    }
+
+    public function isAdmin()
+    {
+        return $this->role >= self::ROLE_ADMIN;
+    }
+
+    public function isOverlord()
+    {
+        return $this->role >= self::ROLE_OVERLORD;
     }
 
     /**
