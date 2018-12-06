@@ -34,7 +34,8 @@ class Rating extends ActiveRecord
     public function rules()
     {
         return [
-            [['product_id', 'user_id', 'value'], 'integer'],
+            [['product_id', 'user_id'], 'integer'],
+            [['value'], 'number'],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
@@ -49,7 +50,7 @@ class Rating extends ActiveRecord
             'id' => 'ID',
             'product_id' => 'Product ID',
             'user_id' => 'User ID',
-            'value' => 'Value',
+            'value' => 'Rating',
         ];
     }
 
@@ -67,5 +68,10 @@ class Rating extends ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    public function isUnrated()
+    {
+        return $this->value==0;
     }
 }

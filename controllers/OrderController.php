@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\order\OrderForm;
 use app\models\order\OrderItem;
+use app\models\product\Product;
 use app\models\user\User;
 use Yii;
 use app\models\order\Order;
@@ -145,11 +146,12 @@ class OrderController extends Controller
         /** @var User $user */
         $user = Yii::$app->user->identity;
         $model = $user->cart;
+        $product = Product::findOne($productId);
 
         if ($model->addItem($productId)) {
-            Yii::$app->session->setFlash('success', 'Product added to cart');
+            Yii::$app->session->setFlash('success', "Product $product->title added to cart.");
         } else {
-            Yii::$app->session->setFlash('warning', 'You already added this product');
+            Yii::$app->session->setFlash('warning', "You already added $product->title.");
 
         }
 
@@ -166,11 +168,12 @@ class OrderController extends Controller
         /** @var User $user */
         $user = Yii::$app->user->identity;
         $model = $user->cart;
+        $product = Product::findOne($productId);
 
         if ($model->removeItem($productId)) {
-            Yii::$app->session->setFlash('success', 'Item removed from cart');
+            Yii::$app->session->setFlash('success', "$product->title removed from cart");
         } else {
-            Yii::$app->session->setFlash('warning', 'Item could not be removed');
+            Yii::$app->session->setFlash('warning', "$product->title could not be removed");
         }
 
         return $this->redirect(['/order/cart']);
@@ -193,6 +196,8 @@ class OrderController extends Controller
             }
 
             if ($model->save($user->cart)) {
+
+                $user->assignDiscounts();
                 Yii::$app->session->setFlash('success', 'Your order has been submitted. We will e-mail you soon!');
                 return $this->redirect(['site/index']);
             }
@@ -239,7 +244,7 @@ class OrderController extends Controller
         } else {
             Yii::$app->session->setFlash('danger', 'Status did not work, model save failed!');
         }
-        return $this->redirect(['order/detailed', 'id' => $id]);
+        return $this->redirect(['order/view', 'id' => $id]);
     }
 
     /**
@@ -255,7 +260,7 @@ class OrderController extends Controller
         } else {
             Yii::$app->session->setFlash('danger', 'Mail did not send, something went wrong.');
         }
-        return $this->redirect(['order/detailed', 'id' => $id]);
+        return $this->redirect(['order/view', 'id' => $id]);
 
     }
 

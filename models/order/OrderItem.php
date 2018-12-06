@@ -2,6 +2,7 @@
 
 namespace app\models\order;
 
+use app\models\discount\Discount;
 use app\models\product\Product;
 use Yii;
 use yii\db\ActiveRecord;
@@ -73,5 +74,29 @@ class OrderItem extends ActiveRecord
     public function getPrice()
     {
         return $this->amount * $this->product->price;
+    }
+
+    public function getEndPrice()
+    {
+        return $this->amount * $this->product->getEndPrice($this->order->user_id);
+    }
+
+    public function discountApplies()
+    {
+        /** @var Discount $discount */
+        if ($discount = $this->order->user->getDiscountOn($this->product->category_id)) {
+            if (strtotime($this->order->created_at) >= strtotime($discount->created_at)) {
+                /*echo '<br>';
+                echo 'Order: ' . strtotime($this->order->created_at) . '<br>';
+                echo 'Discount: ' . strtotime($discount->created_at) . '<br>';
+                if(strtotime($this->order->created_at) >= strtotime($discount->created_at))
+                    echo 'Order was created later';
+                else
+                    echo 'Discount was created later';
+                die;*/
+                return $discount;
+            }
+        }
+        return null;
     }
 }

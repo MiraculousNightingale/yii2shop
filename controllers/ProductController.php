@@ -5,9 +5,12 @@ namespace app\controllers;
 
 use app\models\category\Category;
 use app\models\comment\Comment;
+use app\models\comment\CommentSearch;
 use app\models\product\ProductSearch;
 use app\models\product\ProductFeatureForm;
 use app\models\product\ProductForm;
+use app\models\rating\Rating;
+use app\models\user\User;
 use Yii;
 use app\models\product\Product;
 use yii\base\Model;
@@ -59,8 +62,13 @@ class ProductController extends Controller
      */
     public function actionView($id)
     {
+        $searchModel = new CommentSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -161,8 +169,40 @@ class ProductController extends Controller
     public function actionDetaliedView($id)
     {
         $product = $this->findModel($id);
+        if (!$rating = $product->getRatingFromUser(Yii::$app->user->getId())) {
+            $rating = new Rating();
+        }
         $comment = new Comment();
-        return $this->render('_detailed', ['product' => $product, 'comment' => $comment]);
+        return $this->render('_detailed', ['product' => $product, 'comment' => $comment, 'rating' => $rating]);
+    }
+
+    /**
+     * @param $id
+     * @param $userId
+     * @param $value
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionRate($id, $userId)
+    {
+        $product = $this->findModel($id);
+        $user = User::findOne($userId);
+        if (!$rating = $product->getRatingFromUser($userId)) {
+            $rating = new Rating();
+        }
+        if ($rating->load(Yii::$app->request->post())) {
+            if (!$rating->isUnrated()) {
+                $rating->link('product', $product);
+                $rating->link('user', $user);
+            } elseif ($product->ratedByUser($userId)) {
+                $rating->delete();
+            }
+            $value = ($rating->value) ? $rating->value : 0;
+            Yii::$app->session->setFlash('success', "Rated successfully as $value!");
+        } else {
+            Yii::$app->session->setFlash('danger', "Rating failed . ");
+        }
+        return $this->redirect(['product/detalied-view', 'id' => $id]);
     }
 
     /**

@@ -20,7 +20,8 @@ use yii\widgets\Pjax;
 
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data', 'id' => 'product-form']]); ?>
 
-    <img class="center-block col-lg-6" id="preview">
+    <img class="center-block col-lg-6" id="preview"
+         src="<?= (isset($product->source->image)) ? $product->source->image : '' ?>">
 
     <?= $form->field($product, 'imageFile')->fileInput(['onchange' => 'loadFile(event)']) ?>
 

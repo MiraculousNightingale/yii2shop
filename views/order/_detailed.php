@@ -18,6 +18,9 @@ use yii\widgets\ActiveForm;
 <div class="panel panel-body panel-primary">
     <h3 class="panel-heading">Order ID <?= $model->id ?></h3>
     <h4>Made at: <?= $model->created_at ?></h4>
+    <h3>Description</h3>
+    <div class="well"><?= ($model->description) ? $model->description : 'No description.' ?></div>
+    <div></div>
     <div class="h3">Ordered products:</div>
     <div class="">
         <?php foreach ($model->items as $item): ?>
@@ -28,9 +31,11 @@ use yii\widgets\ActiveForm;
                     <span class="pull-right"><?= $item->product->getBrandName() ?></span>
                 </a>
                 <div class="panel-body">
-                    <span>Price: <?= $item->product->price ?> UAH</span>
+                    <span>Price: <?= $item->discountApplies() ? $item->product->getEndPrice($model->user_id) : $item->product->price ?>
+                        UAH</span>
+                    <p><?= ($discount = $item->discountApplies()) ? 'Discount: ' . $discount->percent . '%' : '' ?></p>
                     <h5>Amount: <?= $item->amount ?></h5>
-                    <h5>Total: <?= $item->price ?></h5>
+                    <h5>Total: <?= $item->discountApplies() ? $item->getEndPrice() : $item->price ?></h5>
                 </div>
             </div>
         <?php endforeach; ?>

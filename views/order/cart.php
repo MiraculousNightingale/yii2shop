@@ -2,6 +2,7 @@
 
 use app\models\order\Order;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /* @var Order $cart */
@@ -16,10 +17,13 @@ use yii\widgets\ActiveForm;
             'action' => ['order/cart'],
         ]);
         foreach ($cart->items as $item): ?>
-            <div class="panel panel-default">
-                <div class="panel-heading"><?= $item->product->title ?></div>
+            <div class="panel panel-info">
+                <a class="panel-heading center-block btn-info"
+                   href="<?= Url::toRoute(['product/detalied-view', 'id' => $item->id]) ?>"><?= $item->product->title ?></a>
                 <div class="panel-body">
-                    <span>Price: <?= $item->product->price ?> UAH</span>
+                    <span>Price: <?= $item->discountApplies() ? $item->product->getEndPrice($cart->user_id) : $item->product->price ?>
+                        UAH</span>
+                    <p><?= ($discount = $item->discountApplies()) ? 'Discount: ' . $discount->percent . '%' : '' ?></p>
                     <?= $form->field($item, "[$item->id]amount")->textInput() ?>
                     <?= Html::a('Remove', ['order/remove-from-cart', 'productId' => $item->product_id], ['class' => 'btn btn-danger pull-right']) ?>
                 </div>

@@ -34,7 +34,11 @@ class ProductFeatureForm extends DynamicModel
                 }
             }
         } else {
-            parent::__construct(Category::find()->one()->getFeatureNames(), $config);
+            if ($category = Category::find()->one()) {
+                parent::__construct($category->getFeatureNames(), $config);
+            } else {
+                parent::__construct();
+            }
         }
         $this->generateRules();
     }

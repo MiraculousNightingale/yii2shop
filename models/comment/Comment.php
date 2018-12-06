@@ -13,6 +13,7 @@ use yii\db\ActiveRecord;
  *
  * @property int $id
  * @property int $user_id
+ * @property int $product_id
  * @property string $content
  *
  * @property User $user
@@ -34,7 +35,7 @@ class Comment extends ActiveRecord
     public function rules()
     {
         return [
-            [['user_id'], 'integer'],
+            [['user_id', 'product_id'], 'integer'],
             [['content'], 'string'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
@@ -76,5 +77,10 @@ class Comment extends ActiveRecord
     public function getProduct()
     {
         return $this->hasOne(Product::className(), ['id' => 'product_id']);
+    }
+
+    public function getUserName()
+    {
+        return $this->user->username;
     }
 }

@@ -41,14 +41,15 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'Your cart', 'url' => ['/order/cart']],
-            ['label' => 'Your orders', 'url' => ['/order/user-orders', 'userId' => Yii::$app->user->getId()]],
-            Yii::$app->user->identity->isAdmin() ?
+            !Yii::$app->user->isGuest ? ['label' => 'Your cart', 'url' => ['/order/cart']] : '',
+            !Yii::$app->user->isGuest ? ['label' => 'Your orders', 'url' => ['/order/user-orders', 'userId' => Yii::$app->user->getId()]] : '',
+            !Yii::$app->user->isGuest && Yii::$app->user->identity->isAdmin() ?
                 [
                     'label' => 'Administrate',
                     'items' => [
                         Yii::$app->user->identity->isOverlord() ?
                             ['label' => 'Manage Users', 'url' => ['/user/index'], 'options' => ['class' => 'btn-info']] : '',
+                        ['label' => 'Manage Discounts', 'url' => ['/discount/index']],
                         ['label' => 'Manage Orders', 'url' => ['/order/index']],
                         ['label' => 'Manage Products', 'url' => ['/product/index']],
                         ['label' => 'Manage Brands', 'url' => ['/brand/index']],

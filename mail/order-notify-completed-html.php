@@ -10,9 +10,9 @@ use yii\helpers\Html;
 $link = Yii::$app->urlManager->createAbsoluteUrl(['order/detailed', 'id' => $order->id]);
 ?>
 <div class="password-reset" style="font-size: 12px; font-family: Arial, Helvetica, sans-serif;">
-    <h4 style="font-size: 18px">Hello <?= Html::encode($user->username) ?>!</h4>
+    <h3 style="font-size: 18px">Hello <?= Html::encode($user->username) ?>!</h3>
 
-    <h5>Your order(<?= $order->id ?>) made at <?= $order->created_at ?> has been completed.</h5>
+    <h4>Your order(<?= $order->id ?>) made at <?= $order->created_at ?> has been completed.</h4>
 
     <p>
         It means that you can received your products from your local 'Peace Date Yii Shop' department, or if you chose

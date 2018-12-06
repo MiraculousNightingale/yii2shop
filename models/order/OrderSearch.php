@@ -79,8 +79,9 @@ class OrderSearch extends Order
                     'label' => 'Total Amount',
                 ],
                 'description',
-                'price',
-                'amount',
+                'status',
+                'delivery_type',
+                'destination',
             ],
         ]);
 
@@ -104,15 +105,14 @@ class OrderSearch extends Order
             ->andFilterWhere(['like', 'destination', $this->destination])
             ->andFilterWhere(['like', 'created_at', $this->created_at]);
 
+
         //related field for user name and email properties
         $query->joinWith('user');
-        $query->andFilterWhere(['like', 'user.username', $this->userName]);
-        $query->andFilterWhere(['like', 'user.email', $this->userEmail]);
+        $query->andFilterHaving(['like', 'user.username', $this->userName]);
+        $query->andFilterHaving(['like', 'user.email', $this->userEmail]);
 
         //filtration for related fields
         $query->joinWith('products');
-
-        $query->groupBy('product.category_id');
 
         //related field for uniqueCount property
         if (is_numeric($this->uniqueCount))
@@ -124,6 +124,8 @@ class OrderSearch extends Order
                 $query->andFilterHaving(['COUNT(product.id)' => 0])->orFilterHaving(['SUM(product.amount)' => $this->totalCount]);
             else
                 $query->andFilterHaving(['SUM(product.amount)' => $this->totalCount]);
+
+        $query->groupBy('order.id');
 
         return $dataProvider;
     }

@@ -2,6 +2,7 @@
 
 use app\models\user\User;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /* @var User $model */
 
@@ -12,13 +13,11 @@ use yii\helpers\Html;
     <?php foreach ($model->orders as $order):
         if (!$order->isCart()): ?>
             <div class="panel panel-info">
-                <div class="panel-heading clearfix">
+                <a class="panel-heading center-block btn-info clearfix"
+                   href="<?= Url::toRoute(['order/detailed', 'id' => $order->id]) ?>">
                     <div class="pull-left">Order(<?= $order->id ?>)</div>
                     <div class="pull-right">Date: <?= $order->created_at ?></div>
-                </div>
-                <div>
-                    <?= Html::a('Details', ['order/detailed', 'id' => $order->id], ['class' => 'btn btn-block btn-info']) ?>
-                </div>
+                </a>
             </div>
         <?php endif;
     endforeach; ?>

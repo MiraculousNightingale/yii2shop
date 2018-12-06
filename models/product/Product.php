@@ -9,6 +9,8 @@ use app\models\comment\Comment;
 use app\models\feature\Feature;
 use app\models\order\Order;
 use app\models\order\OrderItem;
+use app\models\rating\Rating;
+use app\models\user\User;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -35,6 +37,7 @@ use yii\db\ActiveRecord;
  * @property Feature[] $categoryFeatures
  * @property ProductFeature[] $features
  * @property Comment[] $comments
+ * @property Rating[] $ratings
  *
  * @property array $feature
  *
@@ -90,6 +93,7 @@ class Product extends ActiveRecord
             'brandName' => 'Brand',
             'categoryName' => 'Category',
             'imageUpload' => 'Image',
+            'totalRating' => 'Rating',
         ];
     }
 
@@ -178,7 +182,41 @@ class Product extends ActiveRecord
 
     public function getOrders()
     {
-        return $this->hasMany(Order::className(), ['id'=>'order_id'])->via('orderItems');
+        return $this->hasMany(Order::className(), ['id' => 'order_id'])->via('orderItems');
+    }
+
+    public function getRatings()
+    {
+        return $this->hasMany(Rating::className(), ['product_id' => 'id']);
+    }
+
+    public function getTotalRating()
+    {
+        $sum = 0;
+        foreach ($this->ratings as $rating) {
+            $sum += $rating->value;
+        }
+        return count($this->ratings) > 0 ? $sum / count($this->ratings) : 0;
+    }
+
+    public function getRatingFromUser($id)
+    {
+        return Rating::findOne(['product_id' => $this->id, 'user_id' => $id]);
+    }
+
+    public function ratedByUser($id)
+    {
+        return Rating::find()->where(['product_id' => $this->id, 'user_id' => $id])->exists();
+    }
+
+    public function getEndPrice($id)
+    {
+        if ($id) {
+            $user = User::findOne($id);
+            if ($discount = $user->getDiscounts()->where(['category_id' => $this->category_id])->one())
+                return $this->price - $this->price * ($discount->percent / 100);
+        }
+        return $this->price;
     }
 
     /**

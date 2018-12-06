@@ -24,6 +24,7 @@ class AppAsset extends AssetBundle
     ];
     public $js = [
         'js/jquery.multi-select.js',
+        'js/jquery.fittext.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',

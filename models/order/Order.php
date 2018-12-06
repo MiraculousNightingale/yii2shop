@@ -153,7 +153,11 @@ class Order extends ActiveRecord
     {
         $price = 0;
         foreach ($this->items as $item) {
-            $price += $item->price;
+            if($item->discountApplies()){
+                $price += $item->getEndPrice();
+            }else {
+                $price += $item->price;
+            }
         }
         return $price;
     }
@@ -256,4 +260,5 @@ class Order extends ActiveRecord
         }
         return false;
     }
+
 }

@@ -3,14 +3,14 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\comment\Comment */
+/* @var $model app\models\discount\Discount */
 
-$this->title = 'Update Comment: ' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => "Product $model->product_id", 'url' => ['product/view', 'id' => $model->product_id]];
+$this->title = 'Update Discount: ' . $model->id;
+$this->params['breadcrumbs'][] = ['label' => 'Discounts', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
-<div class="comment-update">
+<div class="discount-update">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

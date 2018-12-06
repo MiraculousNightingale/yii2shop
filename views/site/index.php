@@ -20,6 +20,43 @@ $this->title = 'My Yii Application';
             'action' => ['index'],
             'method' => 'get',
         ]) ?>
+        <h4>Sort</h4>
+        <?= $form->field($searchModel, 'sortBrand')->hiddenInput(['id' => 'sort-brand-input']) ?>
+        <ul>
+            <li>
+                <?= Html::a('Ascending', '#', ['name' => 'brand', 'onclick' => 'sort(this,1)']) ?>
+            </li>
+            <li>
+                <?= Html::a('Descending', '#', ['name' => 'brand', 'onclick' => 'sort(this,2)']) ?>
+            </li>
+        </ul>
+        <?= $form->field($searchModel, 'sortTitle')->hiddenInput(['id' => 'sort-title-input']) ?>
+        <ul>
+            <li>
+                <?= Html::a('Ascending', '#', ['name' => 'title', 'onclick' => 'sort(this,1)']) ?>
+            </li>
+            <li>
+                <?= Html::a('Descending', '#', ['name' => 'title', 'onclick' => 'sort(this,2)']) ?>
+            </li>
+        </ul>
+        <?= $form->field($searchModel, 'sortPrice')->hiddenInput(['id' => 'sort-price-input']) ?>
+        <ul>
+            <li>
+                <?= Html::a('Ascending', '#', ['name' => 'price', 'onclick' => 'sort(this,1)']) ?>
+            </li>
+            <li>
+                <?= Html::a('Descending', '#', ['name' => 'price', 'onclick' => 'sort(this,2)']) ?>
+            </li>
+        </ul>
+        <?= $form->field($searchModel, 'sortRating')->hiddenInput(['id' => 'sort-rating-input']) ?>
+        <ul>
+            <li>
+                <?= Html::a('Ascending', '#', ['name' => 'rating', 'onclick' => 'sort(this,1)']) ?>
+            </li>
+            <li>
+                <?= Html::a('Descending', '#', ['name' => 'rating', 'onclick' => 'sort(this,2)']) ?>
+            </li>
+        </ul>
 
         <h4>Filters</h4>
 
@@ -39,11 +76,17 @@ $this->title = 'My Yii Application';
         <?= $form->field($searchModel, 'title')->textInput() ?>
 
         <?= $form->field($searchModel, 'fromPrice')->textInput() ?>
-
         <?= $form->field($searchModel, 'toPrice')->textInput() ?>
 
+        <!--  Searching by rating values is redundant.  -->
+        <div class="hidden">
+            <?= $form->field($searchModel, 'fromRating')->textInput() ?>
+            <?= $form->field($searchModel, 'toRating')->textInput() ?>
+        </div>
+
         <!--    Planned as feature filter, but implementation is way too difficult    -->
-        <?php if (/*$searchModel->categoryName*/ 0 == 1): ?>
+        <?php if (/*$searchModel->categoryName*/
+            0 == 1): ?>
 
             <h4>Feature filters</h4>
 
@@ -77,6 +120,17 @@ $this->title = 'My Yii Application';
         var form = document.getElementById('filter-form');
         var categoryInput = document.getElementById('category-input');
         categoryInput.value = eventCaller.getAttribute('name');
+        form.submit();
+    }
+    var sort = function (eventCaller, order) {
+        var form = document.getElementById('filter-form');
+        var attr = eventCaller.getAttribute('name');
+        document.getElementById('sort-brand-input').value = 0;
+        document.getElementById('sort-title-input').value = 0;
+        document.getElementById('sort-price-input').value = 0;
+        document.getElementById('sort-rating-input').value = 0;
+        var sortInput = document.getElementById('sort-' + attr + '-input');
+        sortInput.value = order;
         form.submit();
     }
 </script>

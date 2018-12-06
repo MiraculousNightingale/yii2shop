@@ -1,24 +1,22 @@
 <?php
 
-use app\models\product\ProductSearch;
-use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel ProductSearch */
-/* @var $dataProvider ActiveDataProvider */
+/* @var $searchModel app\models\discount\DiscountSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Products';
+$this->title = 'Discounts';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="product-index">
+<div class="discount-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Product', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Discount', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([
@@ -27,12 +25,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'title',
             'categoryName',
-            'brandName',
-            'price',
-            'amount',
-            'totalRating',
+            'userName',
+            'userEmail',
+            'percent',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

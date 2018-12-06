@@ -1,19 +1,19 @@
 <?php
 
-namespace app\models\comment;
+namespace app\models\discount;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\comment\Comment;
+use app\models\discount\Discount;
 
 /**
- * CommentSearch represents the model behind the search form of `app\models\comment\Comment`.
+ * DiscountSearch represents the model behind the search form of `app\models\discount\Discount`.
  */
-class CommentSearch extends Comment
+class DiscountSearch extends Discount
 {
-
-    public $userName;
+    public $categoryName;
+    public $userName, $userEmail;
 
     /**
      * {@inheritdoc}
@@ -21,9 +21,9 @@ class CommentSearch extends Comment
     public function rules()
     {
         return [
-            [['id', 'user_id'], 'integer'],
-            [['content'], 'safe'],
-            [['userName'], 'safe'],
+            [['id', 'category_id', 'user_id', 'percent'], 'integer'],
+            [['userName', 'userEmail'], 'safe'],
+            [['categoryName'], 'safe'],
         ];
     }
 
@@ -45,7 +45,7 @@ class CommentSearch extends Comment
      */
     public function search($params)
     {
-        $query = Comment::find();
+        $query = Discount::find();
 
         // add conditions that should always apply here
 
@@ -55,12 +55,22 @@ class CommentSearch extends Comment
 
         $dataProvider->setSort([
             'attributes' => [
-                'userName' => [
-                    'asc' => ['user.username' => SORT_ASC],
-                    'desc' => ['user.username' => SORT_DESC],
-                    'label' => 'User Name',
+                'categoryName' => [
+                    'asc'=>['category.name'=>SORT_ASC],
+                    'desc'=>['category.name'=>SORT_DESC],
+                    'label'=> 'Category Name',
                 ],
-                'content',
+                'userName'=>[
+                    'asc'=>['user.username'=>SORT_ASC],
+                    'desc'=>['user.username'=>SORT_DESC],
+                    'label'=> 'User Name',
+                ],
+                'userEmail'=>[
+                    'asc'=>['user.email'=>SORT_ASC],
+                    'desc'=>['user.email'=>SORT_DESC],
+                    'label'=> 'User Email',
+                ],
+                'percent',
             ],
         ]);
 
@@ -75,13 +85,17 @@ class CommentSearch extends Comment
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'category_id' => $this->category_id,
             'user_id' => $this->user_id,
+            'percent' => $this->percent,
         ]);
 
-        $query->andFilterWhere(['like', 'content', $this->content]);
+        $query->joinWith('category');
+        $query->andFilterWhere(['like','category.name', $this->categoryName]);
 
         $query->joinWith('user');
         $query->andFilterWhere(['like', 'user.username', $this->userName]);
+        $query->andFilterWhere(['like', 'user.email', $this->userEmail]);
 
         return $dataProvider;
     }

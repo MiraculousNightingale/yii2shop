@@ -2,7 +2,11 @@
 
 namespace app\models\user;
 
+use app\models\comment\Comment;
+use app\models\discount\Discount;
 use app\models\order\Order;
+use app\models\product\Product;
+use app\models\rating\Rating;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\web\Cookie;
@@ -24,6 +28,8 @@ use yii\web\IdentityInterface;
  *
  * @property Order[] $orders
  * @property Order $cart
+ *
+ * @property Discount[] $discounts
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -210,6 +216,21 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasMany(Order::className(), ['user_id' => 'id']);
     }
 
+    public function getRatings()
+    {
+        return $this->hasMany(Rating::className(), ['user_id' => 'id']);
+    }
+
+    public function getComments()
+    {
+        return $this->hasMany(Comment::className(), ['user_id' => 'id']);
+    }
+
+    public function getDiscounts()
+    {
+        return $this->hasMany(Discount::className(), ['user_id' => 'id']);
+    }
+
     /**
      * @return Order Returns cart for current user or null if such was not defined;
      * @throws \Exception
@@ -225,9 +246,46 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->getCart();
     }
 
+    public function getDiscountOn($id)
+    {
+        $product = Product::findOne($id);
+        /** @var Discount $discount */
+        if ($discount = $this->getDiscounts()->where(['category_id' => $product->category_id])->one()) {
+            return $discount;
+        }
+        return null;
+    }
+
+    public function getOrderCountInCategory($id)
+    {
+        $count = 0;
+        foreach ($this->orders as $order) {
+            foreach ($order->items as $item) {
+                if ($item->product->category_id == $id) {
+                    $count += $item->amount;
+                }
+            }
+        }
+        return $count;
+    }
+
+    public function assignDiscounts()
+    {
+        foreach ($this->orders as $order) {
+            foreach ($order->items as $item) {
+                if ($this->getOrderCountInCategory($item->product->category_id) > 30) {
+                    Discount::forUser($this->id, $item->product->category_id, 30);
+                } elseif ($this->getOrderCountInCategory($item->product->category_id) > 20) {
+                    Discount::forUser($this->id, $item->product->category_id, 20);
+                }
+            }
+        }
+        return true;
+    }
+
 
     /**
-     * @param string $auth Key
+     * @param $authKey
      * @return bool if auth key is valid for current user
      */
     public function validateAuthKey($authKey)

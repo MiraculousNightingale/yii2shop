@@ -23,6 +23,15 @@ class ProductSearch extends Product
     public $brandName;
     public $categoryName;
     public $fromPrice, $toPrice;
+    public $fromRating, $toRating;
+
+    //used on index view
+    public $sortBrand, $sortTitle, $sortPrice, $sortRating;
+
+    const
+        SORT_NONE = 0,
+        SORT_ASC = 1,
+        SORT_DESC = 2;
 
     public function rules()
     {
@@ -31,7 +40,8 @@ class ProductSearch extends Product
             [['title', 'description', 'created_at', 'updated_at'], 'safe'],
             [['price'], 'number'],
             [['brandName', 'categoryName'], 'safe'],
-            [['fromPrice', 'toPrice'], 'number'],
+            [['fromPrice', 'toPrice', 'fromRating', 'toRating'], 'number'],
+            [['sortBrand', 'sortTitle', 'sortPrice', 'sortRating'], 'integer'],
         ];
     }
 
@@ -43,6 +53,10 @@ class ProductSearch extends Product
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
+
+    /**
+     * @return $this|array
+     */
 
     /**
      * Creates data provider instance with search query applied
@@ -78,10 +92,44 @@ class ProductSearch extends Product
                 'description',
                 'price',
                 'amount',
+                'totalRating' => [
+                    'asc' => ['AVG(rating.value)' => SORT_ASC],
+                    'desc' => ['AVG(rating.value)' => SORT_DESC],
+                    'label' => 'Rating',
+                ],
             ],
         ]);
 
         $this->load($params);
+
+        // explicit sorting for index listView of products
+        if ($this->sortBrand != self::SORT_NONE)
+            if ($this->sortBrand == self::SORT_ASC) {
+                $dataProvider->getSort()->setAttributeOrders(['brandName' => SORT_ASC]);
+            } elseif ($this->sortBrand == self::SORT_DESC) {
+                $dataProvider->getSort()->setAttributeOrders(['brandName' => SORT_DESC]);
+            }
+
+        if ($this->sortTitle != self::SORT_NONE)
+            if ($this->sortTitle == self::SORT_ASC) {
+                $dataProvider->getSort()->setAttributeOrders(['title' => SORT_ASC]);
+            } elseif ($this->sortTitle == self::SORT_DESC) {
+                $dataProvider->getSort()->setAttributeOrders(['title' => SORT_DESC]);
+            }
+
+        if ($this->sortPrice != self::SORT_NONE)
+            if ($this->sortPrice == self::SORT_ASC) {
+                $dataProvider->getSort()->setAttributeOrders(['price' => SORT_ASC]);
+            } elseif ($this->sortPrice == self::SORT_DESC) {
+                $dataProvider->getSort()->setAttributeOrders(['price' => SORT_DESC]);
+            }
+
+        if ($this->sortRating != self::SORT_NONE)
+            if ($this->sortRating == self::SORT_ASC) {
+                $dataProvider->getSort()->setAttributeOrders(['totalRating' => SORT_ASC]);
+            } elseif ($this->sortRating == self::SORT_DESC) {
+                $dataProvider->getSort()->setAttributeOrders(['totalRating' => SORT_DESC]);
+            }
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
@@ -115,6 +163,14 @@ class ProductSearch extends Product
         $query->joinWith('category');
         $query->andFilterWhere(['like', 'category.name', $this->categoryName]);
 
+        //related field for rating property
+        $query->joinWith('ratings');
+        $query->andFilterHaving(['>=', 'AVG(rating.value)', $this->fromRating])
+            ->andFilterHaving(['<=', 'AVG(rating.value)', $this->toRating]);
+
+        $query->groupBy('product.id');
+
         return $dataProvider;
     }
+
 }
